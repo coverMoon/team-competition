@@ -1,0 +1,7 @@
+{
+    "files.associations": {
+        "trajectory_planner.h": "c",
+        "main.h": "c",
+        "task.h": "c"
+    }
+}

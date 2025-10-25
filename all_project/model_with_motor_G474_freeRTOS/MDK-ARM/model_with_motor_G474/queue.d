@@ -1,0 +1,16 @@
+model_with_motor_g474/queue.o: \
+  ..\Middlewares\Third_Party\FreeRTOS\Source\queue.c \
+  D:\Tools\keil_v5\Arm\ARMCLANG\include\stdlib.h \
+  D:\Tools\keil_v5\Arm\ARMCLANG\include\string.h \
+  ..\Middlewares\Third_Party\FreeRTOS\Source\include\FreeRTOS.h \
+  D:\Tools\keil_v5\Arm\ARMCLANG\include\stddef.h \
+  D:\Tools\keil_v5\Arm\ARMCLANG\include\stdint.h \
+  ..\Core\Inc\FreeRTOSConfig.h \
+  ..\Middlewares\Third_Party\FreeRTOS\Source\include\projdefs.h \
+  ..\Middlewares\Third_Party\FreeRTOS\Source\include\portable.h \
+  ..\Middlewares\Third_Party\FreeRTOS\Source\include\deprecated_definitions.h \
+  ..\Middlewares\Third_Party\FreeRTOS\Source\portable\RVDS\ARM_CM4F\portmacro.h \
+  ..\Middlewares\Third_Party\FreeRTOS\Source\include\mpu_wrappers.h \
+  ..\Middlewares\Third_Party\FreeRTOS\Source\include\task.h \
+  ..\Middlewares\Third_Party\FreeRTOS\Source\include\list.h \
+  ..\Middlewares\Third_Party\FreeRTOS\Source\include\queue.h

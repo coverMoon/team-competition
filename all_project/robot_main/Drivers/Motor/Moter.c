@@ -2,10 +2,11 @@
 
 #define buf_size 256               // UART½ÓÊÕ»º³åÇø´óĞ¡
 
+static SemaphoreHandle_t mi = NULL;
 
 // µç»ú¿ØÖÆ²ÎÊıÅäÖÃ
 #define POSITION_TOLERANCE  50       // DJIµç»úÎ»ÖÃÈİ²î£¨±àÂëÆ÷Öµ£©
-#define CHASSIS_TOLERANCE   0.01f    // µ×ÅÌµç»úÎ»ÖÃÈİ²î£¨rad£©
+#define CHASSIS_TOLERANCE   0.1f    // µ×ÅÌµç»úÎ»ÖÃÈİ²î£¨rad£©
 #define WAIT_TIMEOUT_MS     5000     // µç»úµ½Î»µÈ´ı³¬Ê±Ê±¼ä£¨ms£©
 #define SUCTION_DELAY_MS    500      // ÎüÅÌ¶¯×÷ÑÓ³ÙÊ±¼ä£¨ms£¬È·±£»úĞµ¶¯×÷Íê³É£©
 
@@ -14,7 +15,7 @@ static CyberGear_Motor_Instance *mi_motor = NULL;         // µ×ÅÌ£¨CyberGear£©µç
 static DJI_Motor_Instance *dji_motor_zhuzhou = NULL;     // Ö÷Öá£¨DJI£©µç»úÊµÀı
 static DJI_Motor_Instance *dji_motor_dabi = NULL;        // ´ó±Û£¨DJI£©µç»úÊµÀı
 static DJI_Motor_Instance *dji_motor_xiaobi = NULL;      // Ğ¡±Û£¨DJI£©µç»úÊµÀı
-static uint16_t target_pos = 0;                          // µ×ÅÌÄ¿±êÎ»ÖÃ£¨rad£¬¹©¼à²âÈÎÎñ¶ÁÈ¡£©
+static float target_pos = 0.0f;                          // µ×ÅÌÄ¿±êÎ»ÖÃ£¨rad£¬¹©¼à²âÈÎÎñ¶ÁÈ¡£©
 
 /**
  * @brief  µ×ÅÌµç»ú£¨CyberGear£©³õÊ¼»¯º¯Êı
@@ -27,16 +28,22 @@ static uint16_t target_pos = 0;                          // µ×ÅÌÄ¿±êÎ»ÖÃ£¨rad£¬¹
 void chassis_init(void)
 {
     // »ñÈ¡µ×ÅÌµç»úÊµÀı£¨Ë÷Òı0¶ÔÓ¦ÅäÖÃµÄCyberGearµç»ú£©
-    mi_motor = cybergear_motor_get_instance(0);
-    cybergear_motor_stop(mi_motor);                          // Í£Ö¹µç»ú£¬È·±£³õÊ¼»¯°²È«
-    cybergear_motor_set_mode(mi_motor, MOTOR_CONTROL_MODE_POSITION); // ÉèÖÃÎªÎ»ÖÃ¿ØÖÆÄ£Ê½
-    HAL_Delay(2);                                            // ¶ÌÔİÑÓ³Ù£¬µÈ´ıÄ£Ê½ÇĞ»»ÉúĞ§
-    cybergear_motor_set_current_limit(mi_motor, 15.0f);      // ÉèÖÃ×î´óµçÁ÷ÏŞÖÆÎª15A
-    HAL_Delay(2);                                            // µÈ´ıµçÁ÷²ÎÊıĞ´ÈëÉúĞ§
-    cybergear_motor_enable(mi_motor);                        // Ê¹ÄÜµç»ú£¬ÔÊĞí½ÓÊÕ¿ØÖÆÖ¸Áî
-    HAL_Delay(2);                                            // µÈ´ıµç»úÆô¶¯ÎÈ¶¨
-//    cybergear_motor_request_parameter(mi_motor, PARAM_MECH_POS); // Ö÷¶¯ÇëÇó»úĞµÎ»ÖÃ²ÎÊı
-//    HAL_Delay(2);                                            // µÈ´ıÎ»ÖÃÊı¾İ·´À¡
+   mi_motor = cybergear_motor_get_instance(0);
+	
+	vTaskDelay(pdMS_TO_TICKS(10));
+	cybergear_motor_stop(mi_motor);
+	vTaskDelay(pdMS_TO_TICKS(10));
+	cybergear_motor_set_mode(mi_motor, MOTOR_CONTROL_MODE_POSITION);
+	vTaskDelay(pdMS_TO_TICKS(10));
+	//cybergear_motor_set_current_limit(mi_motor, 15.0f);
+	vTaskDelay(pdMS_TO_TICKS(10));
+	cybergear_motor_enable(mi_motor);
+	vTaskDelay(pdMS_TO_TICKS(10));
+	cybergear_motor_set_zero_position(mi_motor);
+	vTaskDelay(pdMS_TO_TICKS(10));
+  //cybergear_motor_set_speed(mi_motor, 6.28);
+	//vTaskDelay(pdMS_TO_TICKS(10));
+	trajectory_planner_start(mi_motor);                                            // µÈ´ıÎ»ÖÃÊı¾İ·´À¡
 }
 
 /**
@@ -53,11 +60,7 @@ void chassis_control(float Angle)
     float target_rad = cybergear_motor_degree2rad(Angle);
 
     // 2. ·¢ËÍÎ»ÖÃ¿ØÖÆÖ¸Áî£ºÄ¿±ê»¡¶È¡¢ËÙ¶ÈÏŞÖÆ£¨50rpm×ª»»Îªrad/s£©
-    cybergear_motor_set_position(
-        mi_motor, 
-        target_rad, 
-        cybergear_motor_rpm2rad(50)
-    );
+    trajectory_planner_set_target(target_rad);
 
     // 3. Í¬²½Ä¿±êÎ»ÖÃµ½È«¾Ö±äÁ¿£¬¹©ChassisMonitorÈÎÎñ¶ÁÈ¡£¨¹Ø¼ü£ºÈ·±£¼à²âÈÎÎñ»ñÈ¡ÕıÈ·Ä¿±êÖµ£©
     target_pos = target_rad;
@@ -166,11 +169,3 @@ bool all_motors_in_position(void)
     return true;
 }
 
-void chassic_get(void)
-{
-	 cybergear_motor_set_position(
-        mi_motor, 
-        target_pos, 
-        cybergear_motor_rpm2rad(50)
-    );
-}

@@ -71,7 +71,7 @@
 
 // --- 电机控制参数 ---
 // 电机内部的速度限制 (rad/s) - 必须大于 PLANNER_MAX_VELOCITY
-#define MOTOR_INTERNAL_SPD_LIMIT    (5.0f) 
+#define MOTOR_INTERNAL_SPD_LIMIT    (10.0f) 
 
 
 

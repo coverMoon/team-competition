@@ -9,6 +9,8 @@
 #include "string.h"
 #include <stdlib.h>
 #include "cmsis_os.h"
+#include "trajectory_planner.h"
+#include "semphr.h"
 
 void chassis_init(void);
 void chassis_control(float Angle);

@@ -65,6 +65,9 @@ void Error_Handler(void);
 #ifndef M_PI
 #define M_PI 3.14159265358979323846
 #endif
+#ifndef USE_FREERTOS
+#define USE_FREERTOS
+#endif
 /* USER CODE END Private defines */
 
 #ifdef __cplusplus

@@ -29,10 +29,10 @@ typedef struct {
 static const PolarCoord task1_boxes[] = {
     {450.0f, 60.0f},
     {350.0f, 45.0f},  
-    {400.0f, 30.0f}
+    {400.0f, 330.0f}
 };
 
-static const PolarCoord task1_target = {350.0f, 90.0f};
+static const PolarCoord task1_target = {350.0f, 270.0f};
 
 /* ------------------------- 任务二相关定义 ------------------------- */
 typedef struct {
@@ -43,13 +43,13 @@ typedef struct {
 
 static const BoxZone task2_zones[] = {
     {{350.0f, 0.0f},155.0f, 1},      // 一区
-    {{350.0f, +45.0f}, 155.0f, 1},
-    {{350.0f, -45.0f}, 155.0f, 1},
-    {{600.0f, +30.0f}, 390.0f, 2},   // 二区
-    {{600.0f, -30.0f}, 390.0f, 2},
+    {{350.0f, 45.0f}, 155.0f, 1},
+    {{350.0f, 315.0f}, 155.0f, 1},
+    {{600.0f, 30.0f}, 390.0f, 2},   // 二区
+    {{600.0f, 330.0f}, 390.0f, 2},
     {{550.0f, 0.0f}, 260.0f, 3},     // 三区
-    {{550.0f, +60.0f}, 260.0f, 3},
-    {{550.0f, -60.0f}, 260.0f, 3}
+    {{550.0f, 60.0f}, 260.0f, 3},
+    {{550.0f, 300.0f}, 260.0f, 3}
 };
 
 static const PolarCoord task2_pickup_pos = {350.0f, 180.0f};
@@ -115,8 +115,6 @@ void Task0(void *argument)
 void task1_rtos()
 {
         // 初始化电机
-        chassis_init();
-        dji_init();
         
         // 依次抓取三个纸箱
         for (int i = 0; i < 3; i++) 
@@ -130,7 +128,9 @@ void task1_rtos()
             move_to_position(task1_target.radius, task1_target.angle, i * SMALL_BOX_HEIGHT+20.0f,task1_xiaobi_angle);
 						// 移动到放置位置并放置
             move_to_position(task1_target.radius, task1_target.angle, i * SMALL_BOX_HEIGHT,task1_xiaobi_angle);
-											
+						while (!all_motors_in_position()) {
+							osDelay(10);
+						}						
             place_box();
         }
         
@@ -138,13 +138,10 @@ void task1_rtos()
         move_to_position(MAIN_SHAFT_MAX_LENGTH,0.0f ,BIG_ARM_MAX_LENGTH,task1_xiaobi_angle );
 }
 
-
 void task2_rtos()
 {
-        chassis_init();
-        dji_init();
 	int chosen_target[4]={3,4,5,6};
-	for(int i = 0; i > 4; i++)
+	for(int i = 0; i < 4; i++)
 	{
 		//稍微抬升避免碰撞
     move_to_position(task2_pickup_pos.radius, task2_pickup_pos.angle, i * SMALL_BOX_HEIGHT+20.0f,task1_xiaobi_angle);
@@ -173,6 +170,7 @@ void task2_rtos()
 
 void task3_rtos()
 {
+	printf("OOK");
     Task3Position_t positions[3];
     uint8_t received_positions = 0;
     
@@ -180,11 +178,9 @@ void task3_rtos()
     while (received_positions < 3) {
         if (osMessageQueueGet(task3positionHandle, &positions[received_positions], NULL, osWaitForever) == osOK) {
             received_positions++;
+					printf("OK");
         }
-    }
-        chassis_init();
-        dji_init();
-        
+    }        
         for (int i = 3; i > 0; i--) 
         {
 						//稍微抬升避免碰撞
@@ -197,8 +193,8 @@ void task3_rtos()
             move_to_position(task2_pickup_pos.radius, task2_pickup_pos.angle, i * SMALL_BOX_HEIGHT+BIG_BOX_HEIGHT,task3_xiaobi_angle);
 
             // 放置到随机位置
-            move_to_position(positions[i].radius, positions[i].angle, i * SMALL_BOX_HEIGHT,task3_xiaobi_angle);
-            move_to_position(positions[i].radius, positions[i].angle, SMALL_BOX_HEIGHT+5.0f,task3_xiaobi_angle);
+            move_to_position(positions[i].radius-75.0f, positions[i].angle, i * SMALL_BOX_HEIGHT+BIG_BOX_HEIGHT,task3_xiaobi_angle);
+            move_to_position(positions[i].radius-75.0f, positions[i].angle, SMALL_BOX_HEIGHT+5.0f,task3_xiaobi_angle);
             place_box();
         }
         
@@ -212,7 +208,7 @@ void task3_rtos()
 void send_task3_positions(Task3Position_t positions[], uint8_t count)
 {
     for (int i = 0; i < count && i < 3; i++) {
-        osMessageQueuePut(task3positionHandle, &positions[i], 0, osWaitForever);
+        osMessageQueuePut(task3positionHandle, &positions[i], 0, 0);
     }
 }
 
@@ -236,18 +232,15 @@ static void move_to_position(float radius, float angle, float height,float xiaob
     
     // 控制小臂旋转（2006电机）
     xiaobi_control(xiaobi_angle);
-													
 		    // 控制主轴身长（3508电机1）
     zhuzhou_control(height);
-								
+	    //控制主轴旋转到目标角度（小米电机）
     chassis_control(angle);
-									
     // 控制大臂伸长（3508电机2）
     dabi_control(radius);
 						while (!all_motors_in_position()) {
 							osDelay(10);
-						}
-printf("ready");						
+						}						
 }
 
 

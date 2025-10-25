@@ -7,12 +7,12 @@
   ..\Drivers\CMSIS\Device\ST\STM32G4xx\Include\stm32g474xx.h \
   ..\Drivers\CMSIS\Include\core_cm4.h \
   D:\Tools\keil_v5\Arm\ARMCLANG\include\stdint.h \
-  E:\project\RoboCon\temp_project\robot_main\Drivers\CMSIS\Include\cmsis_version.h \
-  E:\project\RoboCon\temp_project\robot_main\Drivers\CMSIS\Include\cmsis_compiler.h \
-  E:\project\RoboCon\temp_project\robot_main\Drivers\CMSIS\Include\cmsis_armclang.h \
+  E:\project\RoboCon\team_competition\all_project\robot_main\Drivers\CMSIS\Include\cmsis_version.h \
+  E:\project\RoboCon\team_competition\all_project\robot_main\Drivers\CMSIS\Include\cmsis_compiler.h \
+  E:\project\RoboCon\team_competition\all_project\robot_main\Drivers\CMSIS\Include\cmsis_armclang.h \
   D:\Tools\keil_v5\Arm\ARMCLANG\include\arm_compat.h \
   D:\Tools\keil_v5\Arm\ARMCLANG\include\arm_acle.h \
-  E:\project\RoboCon\temp_project\robot_main\Drivers\CMSIS\Include\mpu_armv7.h \
+  E:\project\RoboCon\team_competition\all_project\robot_main\Drivers\CMSIS\Include\mpu_armv7.h \
   ..\Drivers\CMSIS\Device\ST\STM32G4xx\Include\system_stm32g4xx.h \
   ..\Drivers\STM32G4xx_HAL_Driver\Inc\Legacy\stm32_hal_legacy.h \
   D:\Tools\keil_v5\Arm\ARMCLANG\include\stddef.h \
@@ -53,4 +53,7 @@
   ..\Drivers\Control\pid.h ..\Drivers\Motor\cybergear_motor.h \
   ..\Drivers\Motor\Moter.h \
   D:\Tools\keil_v5\Arm\ARMCLANG\include\string.h \
-  D:\Tools\keil_v5\Arm\ARMCLANG\include\stdlib.h
+  D:\Tools\keil_v5\Arm\ARMCLANG\include\stdlib.h \
+  ..\Drivers\Chassis\Inc\trajectory_planner.h \
+  ..\Middlewares\Third_Party\FreeRTOS\Source\include\semphr.h \
+  ..\Middlewares\Third_Party\FreeRTOS\Source\include\queue.h

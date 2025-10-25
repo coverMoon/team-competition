@@ -33,6 +33,8 @@
 #include "stdio.h"
 #include "string.h"
 #include <stdlib.h>
+#include "trajectory_planner.h"
+#include "task_rtos.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -48,7 +50,7 @@
 /* USER CODE BEGIN PD */
 uint8_t rx_buffer[buf_size]; 
 volatile int16_t sys = TASK_NONE; 
-
+Task3Position_t position[3];
 #define POSITION_TOLERANCE  50       // DJI电机位置容差（编码器值）
 #define CHASSIS_TOLERANCE   0.01f    // 底盘电机位置容差（rad）
 #define WAIT_TIMEOUT_MS     5000     // 超时时间（ms）
@@ -125,7 +127,7 @@ void MX_FREERTOS_Init(void) {
   /* USER CODE BEGIN Init */
 	fdcan_bsp_init();
 	HAL_UARTEx_ReceiveToIdle_DMA(&huart1, rx_buffer, buf_size);
-
+	trajectory_planner_init();
     dji_motors_init();
 	cybergear_motors_init();
 
@@ -261,17 +263,42 @@ void  HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t Size)
 {
   if (huart == &huart1)
   {
-	rx_buffer[Size]='\0';
-	  printf("7");
-	  if(rx_buffer[0] == 'a')
-	  {
-		  printf("6");
-	  sys = TASK_1; 
-	  }
-	  
-		
-	  HAL_UARTEx_ReceiveToIdle_DMA(&huart1, rx_buffer, buf_size);
-  }
+    rx_buffer[Size]='\0';
+      printf("7");
+      if(rx_buffer[0] == 'a')
+      {
+          printf("a");
+      sys = TASK_1; 
+      }
+        else if(rx_buffer[0] == 'b')
+        {
+      sys = TASK_2; 
+                      printf("b");
+
+        }
+        else if(rx_buffer[0] == 'c')
+        {
+      sys = TASK_3; 
+                      printf("c");
+
+        }
+      else if(rx_buffer[0] == 'F') 
+        {
+                    float number[20];
+                    sscanf((char*)rx_buffer,"F%fA%fS%fA%fL%fA%f",&number[0],&number[1],&number[2],&number[3],&number[4],&number[5]);
+        position[0].radius=number[0];
+        position[0].angle=number[1];
+        position[1].radius=number[2];
+        position[1].angle=number[3];
+        position[2].radius=number[4];
+        position[2].angle=number[5];
+        send_task3_positions(position,3);
+                              printf("f");
+
+        }
+      HAL_UARTEx_ReceiveToIdle_DMA(&huart1, rx_buffer, buf_size);
+  
 }
+    }
 /* USER CODE END Application */
 

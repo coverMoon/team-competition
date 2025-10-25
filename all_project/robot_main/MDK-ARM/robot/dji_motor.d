@@ -8,12 +8,12 @@
   ..\Drivers\CMSIS\Device\ST\STM32G4xx\Include\stm32g474xx.h \
   ..\Drivers\CMSIS\Include\core_cm4.h \
   D:\Tools\keil_v5\Arm\ARMCLANG\include\stdint.h \
-  E:\project\RoboCon\temp_project\robot_main\Drivers\CMSIS\Include\cmsis_version.h \
-  E:\project\RoboCon\temp_project\robot_main\Drivers\CMSIS\Include\cmsis_compiler.h \
-  E:\project\RoboCon\temp_project\robot_main\Drivers\CMSIS\Include\cmsis_armclang.h \
+  E:\project\RoboCon\team_competition\all_project\robot_main\Drivers\CMSIS\Include\cmsis_version.h \
+  E:\project\RoboCon\team_competition\all_project\robot_main\Drivers\CMSIS\Include\cmsis_compiler.h \
+  E:\project\RoboCon\team_competition\all_project\robot_main\Drivers\CMSIS\Include\cmsis_armclang.h \
   D:\Tools\keil_v5\Arm\ARMCLANG\include\arm_compat.h \
   D:\Tools\keil_v5\Arm\ARMCLANG\include\arm_acle.h \
-  E:\project\RoboCon\temp_project\robot_main\Drivers\CMSIS\Include\mpu_armv7.h \
+  E:\project\RoboCon\team_competition\all_project\robot_main\Drivers\CMSIS\Include\mpu_armv7.h \
   ..\Drivers\CMSIS\Device\ST\STM32G4xx\Include\system_stm32g4xx.h \
   ..\Drivers\STM32G4xx_HAL_Driver\Inc\Legacy\stm32_hal_legacy.h \
   D:\Tools\keil_v5\Arm\ARMCLANG\include\stddef.h \
@@ -37,4 +37,13 @@
   D:\Tools\keil_v5\Arm\ARMCLANG\include\stdio.h \
   D:\Tools\keil_v5\Arm\ARMCLANG\include\stdbool.h \
   D:\Tools\keil_v5\Arm\ARMCLANG\include\math.h ..\Drivers\Control\pid.h \
-  ..\Drivers\FDCAN_BSP\fdcan_bsp.h
+  ..\Drivers\FDCAN_BSP\fdcan_bsp.h \
+  ..\Middlewares\Third_Party\FreeRTOS\Source\include\FreeRTOS.h \
+  ..\Core\Inc\FreeRTOSConfig.h \
+  ..\Middlewares\Third_Party\FreeRTOS\Source\include\projdefs.h \
+  ..\Middlewares\Third_Party\FreeRTOS\Source\include\portable.h \
+  ..\Middlewares\Third_Party\FreeRTOS\Source\include\deprecated_definitions.h \
+  ..\Middlewares\Third_Party\FreeRTOS\Source\portable\RVDS\ARM_CM4F\portmacro.h \
+  ..\Middlewares\Third_Party\FreeRTOS\Source\include\mpu_wrappers.h \
+  ..\Middlewares\Third_Party\FreeRTOS\Source\include\task.h \
+  ..\Middlewares\Third_Party\FreeRTOS\Source\include\list.h

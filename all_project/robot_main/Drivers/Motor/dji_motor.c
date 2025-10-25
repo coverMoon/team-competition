@@ -4,9 +4,10 @@
   * @brief          : DJI电机控制驱动实现文件
   * @author         : 秦泽宇 & Gemini
   * @date           : 2025-10-09
-  * @version        : v1.1
+  * @version        : v1.2
   * @note           :
-  * - v1.1(2025-10-18): 修改部分函数标签，以适配更新后的fdcan_bsp。
+  * - v1.2 (2025-10-20): 新增对FreeRTOS的适配升级，使用条件编译与裸机区分。
+  * - v1.1 (2025-10-18): 修改部分函数标签，以适配更新后的fdcan_bsp。
   ******************************************************************************
   * @attention
   * 
@@ -26,12 +27,29 @@
   *    `dji_motor_set_speed()` 来下达控制指令。
   * 5. 电机的CAN报文接收和PID计算在 `dji_motor_message_handler()` 回调函数中
   *    自动完成，无需用户干预。
+  * 
+  * [FreeRTOS 线程安全支持]
+  * 1. 由于DJI电机的上层API不涉及发送CAN报文，因此线程安全仅出现在对共享变量的读/写
+  *    以及可能(但微小)的中断冲突中。本驱动通过实现临界区保护，解决在 FreeRTOS 环境下
+  *    任务与CAN中断并发访问共享数据（如目标值、控制模式）可能导致的风险。
+  * 2. 所有线程安全代码通过条件编译宏 `USE_FREERTOS` 管理，确保了对裸机环境的兼容性。
+  * 3. 要在FreeRTOS项目中使用，请在全局头文件 (如 `main.h`) 中添加以下定义：
+  *     #ifndef USE_FREERTOS
+  *     #define USE_FREERTOS
+  *     #endif
+  * 4. 驱动内部已自动处理所有并发保护，上层应用开发者无需额外操作。
+  * 
   *
   ******************************************************************************
   */
 
 #include "dji_motor.h"
-#include "fdcan_bsp.h" // 引入底层FDCAN模块
+#include "fdcan_bsp.h" 
+
+#ifdef USE_FREERTOS
+    #include "FreeRTOS.h"
+    #include "task.h" 
+#endif
 
 
 /* ------------------------- Private Defines ------------------------- */
@@ -66,8 +84,11 @@ static void dji_motor_configure(uint8_t index, const uint16_t id, FDCAN_HandleTy
                                 float loc_kp, float loc_ki, float loc_kd,
                                 float spd_kp, float spd_ki, float spd_kd,
 																float loc_out_limit_up, float loc_out_limit_down,
-																float spd_out_limit_up, float spd_out_limit_down);
 
+                                                                float spd_out_limit_up, float spd_out_limit_down);
+// 用于并发控制的私有函数
+static void dji_critical_section_enter(void);
+static void dji_critical_section_exit(void);
 
 /* ------------------------- Public Function Implementations ------------------------- */
 
@@ -156,8 +177,11 @@ DJI_Motor_Instance* dji_motor_get_instance(uint8_t motor_index)
 void dji_motor_set_location(DJI_Motor_Instance* motor, int32_t location)
 {
     if (motor == NULL) return;
+
+    dji_critical_section_enter();   // 进入临界区
     motor->control_mode = MOTOR_MODE_POSITION;
     motor->target_loc = location;
+    dji_critical_section_exit();    // 退出临界区
 }
 
 /**
@@ -170,8 +194,11 @@ void dji_motor_set_location(DJI_Motor_Instance* motor, int32_t location)
 void dji_motor_set_speed(DJI_Motor_Instance* motor, int16_t speed)
 {
     if (motor == NULL) return;
+
+    dji_critical_section_enter();   // 进入临界区
     motor->control_mode = MOTOR_MODE_SPEED;
     motor->target_speed = speed;
+    dji_critical_section_exit();    // 退出临界区
 }
 
 /**
@@ -180,9 +207,9 @@ void dji_motor_set_speed(DJI_Motor_Instance* motor, int16_t speed)
  */
 void dji_motor_stop_all(void)
 {
+    dji_critical_section_enter();   // 进入临界区
     dji_motor_control_enabled = false;
-    // 为了立即生效，可以主动发送一次零电流指令
-    dji_motor_send_commands(NULL); 
+    dji_critical_section_exit();    // 退出临界区
 }
 
 /**
@@ -191,7 +218,9 @@ void dji_motor_stop_all(void)
  */
 void dji_motor_resume_all(void)
 {
+    dji_critical_section_enter();   // 进入临界区
     dji_motor_control_enabled = true;
+    dji_critical_section_exit();    // 退出临界区
 }
 
 /* ------------------------- Internal/Callback Function Implementations ------------------------- */
@@ -209,7 +238,7 @@ void dji_motor_message_handler(void* instance, FDCAN_RxHeaderTypeDef* rx_header,
 {
     if (instance == NULL) return;
     
-		// 将接收到的实例转换回电机实例
+	// 将接收到的实例转换回电机实例
     DJI_Motor_Instance* motor = (DJI_Motor_Instance*)instance;
 
     // 1. 解析数据并更新电机状态
@@ -406,4 +435,30 @@ static void dji_motor_send_commands(DJI_Motor_Instance* trigger_motor)
             }
         }
     }
+}
+
+/**
+ * @brief   进入临界区，保护共享数据
+ * @details RTOS环境下调用FreeRTOS的API，裸机环境下直接关中断
+ */
+static void dji_critical_section_enter(void)
+{
+#ifdef USE_FREERTOS
+    taskENTER_CRITICAL();
+#else
+    __disable_irq();
+#endif
+}
+
+/**
+ * @brief   退出临界区，恢复现场
+ * @details RTOS环境下调用FreeRTOS的API，裸机环境下直接开中断
+ */
+static void dji_critical_section_exit(void)
+{
+#ifdef USE_FREERTOS
+    taskEXIT_CRITICAL();
+#else
+    __enable_irq();
+#endif
 }

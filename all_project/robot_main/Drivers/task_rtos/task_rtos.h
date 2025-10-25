@@ -18,6 +18,7 @@ typedef struct {
 extern osMessageQueueId_t task3positionHandle;
 extern osMutexId_t motorMutexHandle;
 
+
 // 任务函数声明
 void task1_rtos();
 void task2_rtos();

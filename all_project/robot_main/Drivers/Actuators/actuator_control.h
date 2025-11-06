@@ -1,5 +1,5 @@
-#ifndef MOTER_H
-#define MOTER_H
+#ifndef ACTUATOR_CONTROL_H
+#define ACTUATOR_CONTROL_H
 
 #include "dji_motor.h"
 #include "cybergear_motor.h"

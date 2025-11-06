@@ -1,265 +1,324 @@
-#include "task_rtos.h"
+#include "task_rtos.h" 
+#include "actuator_control.h"	// åŒ…å«ç”µæœºæ§åˆ¶å±‚
+#include "stdio.h"
 
-/* ------------------------- »úĞµ±Û²ÎÊı¶¨Òå ------------------------- */
-#define ARM_LENGTH 300.0f           // Ğ¡±Û³¤¶È (mm)
-#define MAIN_SHAFT_MIN_LENGTH 0.0f  // Ö÷Öá×îĞ¡³¤¶È (mm)
-#define MAIN_SHAFT_MAX_LENGTH 400.0f // Ö÷Öá×î´ó³¤¶È (mm)
-#define BIG_ARM_MIN_LENGTH 0.0f     // ´ó±Û×îĞ¡³¤¶È (mm)
-#define BIG_ARM_MAX_LENGTH 400.0f   // ´ó±Û×î´ó³¤¶È (mm)
-#define SMALL_BOX_HEIGHT 150.0f        // Ğ¡Ö½Ïä¸ß¶È (mm)
-#define BIG_BOX_HEIGHT 180.0f          //´óÖ½Ïä¸ß¶È£¨mm£©
-#define TASK_NONE     0            // ÎŞÈÎÎñ×´Ì¬
-#define TASK_1 1                   // ÈÎÎñ1£ºÏä×Ó¶ÑµşÁ÷³Ì
-#define TASK_2 2                   // ÈÎÎñ2£ºÔ¤Áô
-#define TASK_3 3                   // ÈÎÎñ3£ºÔ¤Áô
-#define task1_xiaobi_angle 0.0f  //ÈÎÎñÒ»ÖĞµÄĞ¡±ÛĞı×ªµÄ½Ç¶È
-#define task3_xiaobi_angle 90.0f //ÈÎÎñÈıÖÖµÄĞ¡±ÛĞı×ªµÄ½Ç¶È
-#define task2_3_xiaobi_angle 75.0f //ÈÎÎñ¶şÖĞÈıÇøµÄĞ¡±ÛĞı×ªµÄ½Ç¶È
-#define task2_2_xiaobi_angle 90.0f //ÈÎÎñ¶şÖĞ¶şÇøµÄĞ¡±ÛĞı×ªµÄ½Ç¶È
-#define task2_3_jian_radius 146.8f //ÈÎÎñ¶şÖĞÈıÇøµÄ¾àÀë²î
-#define task2_3_jia_height 113.1f //ÈÎÎñ¶şÖĞÈıÇøµÄ¸ß¶È²î
-static volatile bool is_task_running = false;            // ÈÎÎñÔËĞĞ×´Ì¬±êÖ¾£¨·ÀÖ¹ÈÎÎñ²¢·¢£©
+// å‚æ•°æµ‹è¯•ç»“æ„ä½“
+extern TestPosition_t test;
 
-/* ------------------------- ÈÎÎñÒ»Ïà¹Ø¶¨Òå ------------------------- */
+/* ------------------------- ä»»åŠ¡çŠ¶æ€å®šä¹‰ ------------------------- */
+#define TASK_NONE 0 // æ— ä»»åŠ¡çŠ¶æ€
+#define TASK_1 1    // ä»»åŠ¡1ï¼šç®±å­å †å æµç¨‹
+#define TASK_2 2    // ä»»åŠ¡2ï¼šå®šç‚¹æ”¾ç½®
+#define TASK_3 3    // ä»»åŠ¡3ï¼šéšæœºæ”¾ç½®
+
+/* ------------------------- ä»»åŠ¡çŠ¶æ€æ ‡å¿— ------------------------- */
+
+// ä»»åŠ¡åˆ‡æ¢å˜é‡ (åœ¨ app_freertos.c ä¸­å®šä¹‰ï¼Œç”±UARTä¸­æ–­ä¿®æ”¹)
+extern volatile int16_t sys;
+// ä»»åŠ¡è¿è¡Œæ ‡å¿—ï¼Œé˜²æ­¢å¤šä»»åŠ¡å¹¶å‘
+static volatile bool is_task_running = false;
+
+/* ------------------------- ä»»åŠ¡äºŒ ç›®æ ‡åŒºåŸŸå®šä¹‰ ------------------------- */
+// (è¡¥å…… .h æ–‡ä»¶ä¸­æœªå®šä¹‰çš„ é«˜åº¦ å’Œ ç±»å‹ ä¿¡æ¯)
 typedef struct {
-    float radius;  // ¾¶Ïò¾àÀë (mm)
-    float angle;   // ½Ç¶È (¶È)
-} PolarCoord;
+    PolarCoord_t pos;    // åæ ‡ (æ¥è‡ª .h æ–‡ä»¶)
+    float height_offset; // æ”¾ç½®çš„ç›®æ ‡é«˜åº¦ (mm)
+    int type;            // åŒºåŸŸç±»å‹ (1, 2, 3)
+} BoxZone_t;
 
-static const PolarCoord task1_boxes[] = {
-    {450.0f, 60.0f},
-    {350.0f, 45.0f},  
-    {400.0f, 330.0f}
+static const BoxZone_t TASK2_ZONES[] = {
+    {TASK2_ZONE1_POS_1, 90.0f, 1},  // 0: ä¸€åŒº
+    {TASK2_ZONE1_POS_2, 90.0f, 1},  // 1: ä¸€åŒº
+    {TASK2_ZONE1_POS_3, 90.0f, 1},  // 2: ä¸€åŒº
+    {TASK2_ZONE2_POS_1, 390.0f, 2}, // 3: äºŒåŒº
+    {TASK2_ZONE2_POS_2, 390.0f, 2}, // 4: äºŒåŒº
+    {TASK2_ZONE3_POS_1, 260.0f, 3}, // 5: ä¸‰åŒº
+    {TASK2_ZONE3_POS_2, 260.0f, 3}, // 6: ä¸‰åŒº
+    {TASK2_ZONE3_POS_3, 260.0f, 3}  // 7: ä¸‰åŒº
 };
 
-static const PolarCoord task1_target = {350.0f, 270.0f};
 
-/* ------------------------- ÈÎÎñ¶şÏà¹Ø¶¨Òå ------------------------- */
-typedef struct {
-    PolarCoord pos;
-    float height;
-    int type;
-} BoxZone;
+/* ------------------------- ç§æœ‰å‡½æ•°å£°æ˜ ------------------------- */
 
-static const BoxZone task2_zones[] = {
-    {{350.0f, 0.0f},155.0f, 1},      // Ò»Çø
-    {{350.0f, 45.0f}, 155.0f, 1},
-    {{350.0f, 315.0f}, 155.0f, 1},
-    {{600.0f, 30.0f}, 390.0f, 2},   // ¶şÇø
-    {{600.0f, 330.0f}, 390.0f, 2},
-    {{550.0f, 0.0f}, 260.0f, 3},     // ÈıÇø
-    {{550.0f, 60.0f}, 260.0f, 3},
-    {{550.0f, 300.0f}, 260.0f, 3}
-};
+// ä»»åŠ¡å®ç°
+static void task1_rtos(void);
+static void task2_rtos(void);
+static void task3_rtos(void);
 
-static const PolarCoord task2_pickup_pos = {350.0f, 180.0f};
+// è¿åŠ¨å­¦å°è£…
+static void move_to_position(float height, float radius, float chassis_angle,float suction_angle);
+static void pickup_box(void);
+static void place_box(void);
 
-/* ------------------------- Ë½ÓĞº¯ÊıÉùÃ÷ ------------------------- */
-static void move_to_position(float radius, float angle, float height,float xiaobi_angle);
-static void pickup_box();
-static void place_box();
-static float calculate_arm_angle(float height);
-static void calculate_arm_lengths(float target_radius, float arm_angle, float* main_shaft_length, float* big_arm_length);
-static osStatus_t wait_for_motion_completion(uint32_t timeout);
 
-/* ------------------------- ÈÎÎñº¯ÊıÊµÏÖ ------------------------- */
+/* ------------------------- ä»»åŠ¡å‡½æ•°å®ç° ------------------------- */
 
 /**
- * @brief  Ö÷ÈÎÎñ£ºÈÎÎñµ÷¶ÈºËĞÄ
- * @details ³õÊ¼»¯µç»úºó£¬Ñ­»·¼ì²âsys±äÁ¿£¬¸ù¾İsysÖµÇĞ»»Ö´ĞĞ²»Í¬ÈÎÎñ
- *          Í¨¹ıis_task_running±êÖ¾·ÀÖ¹ÈÎÎñ²¢·¢Ö´ĞĞ£¬È·±£¶¯×÷°²È«ĞÔ
- * @param  argument: ÈÎÎñ²ÎÊı£¨Î´Ê¹ÓÃ£©
- * @retval ÎŞ
+ * @brief  ä¸»ä»»åŠ¡ï¼šä»»åŠ¡è°ƒåº¦æ ¸å¿ƒ
+ * @details åˆå§‹åŒ–ç”µæœºï¼Œå¾ªç¯æ£€æµ‹syså˜é‡ï¼Œæ ¹æ®syså€¼åˆ‡æ¢æ‰§è¡Œä¸åŒä»»åŠ¡
+ * é€šè¿‡is_task_runningæ ‡å¿—é˜²æ­¢ä»»åŠ¡å¹¶å‘æ‰§è¡Œ
  */
-
 void Task0(void *argument)
 {
-    /* USER CODE BEGIN Task0 */
-    chassis_init();  // ³õÊ¼»¯µ×ÅÌµç»ú
-    dji_init();      // ³õÊ¼»¯DJIµç»ú£¨Ö÷Öá¡¢´ó±Û¡¢Ğ¡±Û£©
+    // åˆå§‹åŒ–ç¡¬ä»¶æŠ½è±¡å±‚
+    chassis_init(); // åˆå§‹åŒ–åº•ç›˜ç”µæœº (å°ç±³ç”µæœº)
+    dji_init();     // åˆå§‹åŒ–DJIç”µæœº (3508*2, 2006*1)
 
-    extern int16_t sys;  // Íâ²¿¶¨ÒåµÄÈÎÎñÇĞ»»±äÁ¿£¨Í¨¹ıUART½ÓÊÕ¸üĞÂ£©
-
-    /* ÎŞÏŞÑ­»·£ºÈÎÎñµ÷¶ÈÂß¼­ */
-    for(;;)
+    /* æ— é™å¾ªç¯ï¼šä»»åŠ¡è°ƒåº¦é€»è¾‘ */
+    for (;;)
     {
-        // ½öµ±ÎŞÈÎÎñÔËĞĞÇÒsysÖ¸¶¨ÓĞĞ§ÈÎÎñÊ±£¬Æô¶¯ĞÂÈÎÎñ
-        if (!is_task_running && sys != TASK_NONE)  {
-            is_task_running = true;  // ±ê¼ÇÈÎÎñ¿ªÊ¼ÔËĞĞ
-            switch(sys) {
-                case TASK_1:
-									task1_rtos();                    
-								break;
-                case TASK_2:
-									task2_rtos();
-									break;
-                case TASK_3:
-									task3_rtos();
-									break;
-                default:
-                    printf("Invalid task: %d\r\n", sys);  // ÎŞĞ§ÈÎÎñ±àºÅÌáÊ¾
-                    break;
+				/*--------------------- å‚æ•°æµ‹è¯• --------------------*/
+				move_to_position(test.height, test.radius, test.chassis_angle, test.suction_angle);
+				xipan_control(test.suction_switch);
+				/*---------------------------------------------------*/
+				
+        // ä»…å½“æ— ä»»åŠ¡è¿è¡Œä¸”sysæŒ‡å®šæœ‰æ•ˆä»»åŠ¡æ—¶ï¼Œå¯åŠ¨æ–°ä»»åŠ¡
+        if (!is_task_running && sys != TASK_NONE)
+        {
+            is_task_running = true; // æ ‡è®°ä»»åŠ¡å¼€å§‹è¿è¡Œ
+            printf("Starting Task %d\r\n", sys);
+
+            switch (sys)
+            {
+            case TASK_1:
+                task1_rtos();
+                break;
+            case TASK_2:
+                task2_rtos();
+                break;
+            case TASK_3:
+                task3_rtos();
+                break;
+            default:
+                printf("Invalid task number: %d\r\n", sys);
+                break;
             }
 
-            // ÈÎÎñÖ´ĞĞÍê³É£¬ÖØÖÃ×´Ì¬
+            // ä»»åŠ¡æ‰§è¡Œå®Œæˆï¼Œé‡ç½®çŠ¶æ€
+            printf("Task %d Finished\r\n", sys);
             is_task_running = false;
-            sys = TASK_NONE;  // ¸´Î»sys£¬µÈ´ıÏÂÒ»´ÎÈÎÎñÖ¸Áî
+            sys = TASK_NONE; // å¤ä½sysï¼Œç­‰å¾…ä¸‹ä¸€æ¬¡ä»»åŠ¡æŒ‡ä»¤
         }
 
-        osDelay(1);  // ½µµÍµ÷¶ÈÆµÂÊ£¬¼õÉÙCPUÕ¼ÓÃ
+        osDelay(20); // é™ä½è°ƒåº¦å™¨è½®è¯¢é¢‘ç‡
     }
-    /* USER CODE END Task0 */
 }
 
-
-void task1_rtos()
+/**
+ * @brief ä»»åŠ¡ä¸€ï¼šç®±å­å †å 
+ * @details æŠ“å–ä¸‰ä¸ªå›ºå®šä½ç½®çš„ç®±å­ï¼Œå †å åˆ°ä¸€ä¸ªå›ºå®šä½ç½®
+ */
+static void task1_rtos(void)
 {
-        // ³õÊ¼»¯µç»ú
+    /* * --- è¿åŠ¨å­¦ä»£ç  ---
+     * * ç¤ºä¾‹é€»è¾‘ï¼š
+     * 1. ç§»åŠ¨åˆ° TASK1_BOX_POS_1 ä¸Šæ–¹å®‰å…¨é«˜åº¦
+     * 2. ä¸‹é™åˆ°æŠ“å–é«˜åº¦
+     * 3. pickup_box()
+     * 4. æŠ¬å‡åˆ°å®‰å…¨é«˜åº¦
+     * 5. ç§»åŠ¨åˆ° TASK1_TARGET_POS ä¸Šæ–¹ (é«˜åº¦ 0 + å®‰å…¨è£•é‡)
+     * 6. ä¸‹é™åˆ°æ”¾ç½®é«˜åº¦ (é«˜åº¦ 0)
+     * 7. place_box()
+     * 8. æŠ¬å‡åˆ°å®‰å…¨é«˜åº¦
+     * 9. ç§»åŠ¨åˆ° TASK1_BOX_POS_2 ...
+     * 10. ...
+     * 11. ç§»åŠ¨åˆ° TASK1_TARGET_POS ä¸Šæ–¹ (é«˜åº¦ 1*SMALL_BOX_HEIGHT + å®‰å…¨è£•é‡)
+     * 12. ä¸‹é™åˆ°æ”¾ç½®é«˜åº¦ (é«˜åº¦ 1*SMALL_BOX_HEIGHT)
+     * 13. ...
+     * 14. é‡å¤æŠ“å– TASK1_BOX_POS_3 å¹¶æ”¾ç½®åœ¨ (é«˜åº¦ 2*SMALL_BOX_HEIGHT)
+     */
+     
+    // ç¤ºä¾‹
+    // move_to_position(TASK1_BOX_POS_1.radius, TASK1_BOX_POS_1.angle, 20.0f, 0.0f);
+    // pickup_box();
+    // move_to_position(TASK1_TARGET_POS.radius, TASK1_TARGET_POS.angle, 0.0f, 0.0f);
+    // place_box();
+
+    printf("Task 1 logic not implemented.\r\n");
+}
+
+/**
+ * @brief ä»»åŠ¡äºŒï¼šå®šç‚¹æ”¾ç½®
+ * @details ä»å›ºå®šä½ç½®æŠ“å–4ä¸ªå°çº¸ç®±ï¼Œæ”¾ç½®åˆ°8ä¸ªå¤§çº¸ç®±ä¸­çš„ä»»æ„4ä¸ª
+ */
+static void task2_rtos(void)
+{
+    // ç­–ç•¥ï¼šé€‰æ‹©è¦æ”¾ç½®çš„4ä¸ªç›®æ ‡åŒºåŸŸçš„ç´¢å¼• (0-7)
+    // ç¤ºä¾‹ï¼šé€‰æ‹© 0, 3, 5, 6
+    int chosen_target_indices[4] = {0, 3, 5, 6};
+
+    for (int i = 0; i < 4; i++)
+    {
+        // 1. è®¡ç®—æŠ“å–é«˜åº¦
+        // æŠ“å–ç¬¬ i ä¸ªç®±å­ (ä»0å¼€å§‹)ï¼Œæ¯ä¸ªé«˜ SMALL_BOX_HEIGHT
+        // æ³¨æ„ï¼šä»ä¸Šå¾€ä¸‹æŠ“å– (ç¬¬0ä¸ªåœ¨æœ€ä¸Š)
+        float pickup_height = (4 - i) * SMALL_BOX_HEIGHT + 15.0f;		// ç•™å¤Ÿä½™é‡
         
-        // ÒÀ´Î×¥È¡Èı¸öÖ½Ïä
-        for (int i = 0; i < 3; i++) 
-        {
-            // ÒÆ¶¯µ½Ö½ÏäÎ»ÖÃ²¢×¥È¡
-            move_to_position(task1_boxes[i].radius, task1_boxes[i].angle, SMALL_BOX_HEIGHT+5.0f,task1_xiaobi_angle);
-            move_to_position(task1_boxes[i].radius, task1_boxes[i].angle, SMALL_BOX_HEIGHT,task1_xiaobi_angle);
-            pickup_box();
-            
-						//ÉÔÎ¢Ì§Éı±ÜÃâÅö×²
-            move_to_position(task1_target.radius, task1_target.angle, i * SMALL_BOX_HEIGHT+20.0f,task1_xiaobi_angle);
-						// ÒÆ¶¯µ½·ÅÖÃÎ»ÖÃ²¢·ÅÖÃ
-            move_to_position(task1_target.radius, task1_target.angle, i * SMALL_BOX_HEIGHT,task1_xiaobi_angle);
-						while (!all_motors_in_position()) {
-							osDelay(10);
-						}						
-            place_box();
+        // 2. æŠ“å–
+        /* * --- è¿åŠ¨å­¦ä»£ç  (æŠ“å–) ---
+         *
+         * 1. ç§»åŠ¨åˆ° TASK2_PICKUP_POS ä¸Šæ–¹ (pickup_height + å®‰å…¨è£•é‡)
+         * 2. ç§»åŠ¨åˆ° TASK2_PICKUP_POS (pickup_height)
+         * 3. pickup_box()
+         * 4. æŠ¬å‡åˆ°å®‰å…¨é«˜åº¦
+         */
+        
+        // 3. è·å–ç›®æ ‡ä½ç½®ä¿¡æ¯
+        int target_index = chosen_target_indices[i];
+        const BoxZone_t* target_zone = &TASK2_ZONES[target_index];
+
+        // 4. æ”¾ç½®
+        /* * --- è¿åŠ¨å­¦ä»£ç  (æ”¾ç½®) ---
+         * * 1. åˆ†æ target_zone->type (1, 2, 3)
+         * 2. æ ¹æ®ä¸åŒç±»å‹ï¼Œè®¡ç®—çœŸå®çš„ move_to_position å‚æ•°
+         * 		(ä¾‹å¦‚äºŒåŒºå’Œä¸‰åŒºéœ€è¦è°ƒæ•´å°è‡‚è§’åº¦å’Œåæ ‡)
+         * 3. ç§»åŠ¨åˆ°ç›®æ ‡ç‚¹ (target_zone->pos.radius, target_zone->pos.angle, target_zone->height_offset)
+         * 4. place_box()
+         * 5. å›åˆ°å®‰å…¨ä½ç½®
+         */
+
+
+        if (target_zone->type == 1) 
+				{
+            // ä¸€åŒºæ”¾ç½®é€»è¾‘
+            printf("Placing in Zone 1\r\n");
+        } 
+				else if (target_zone->type == 2) 
+				{
+            // äºŒåŒºæ”¾ç½®é€»è¾‘
+            printf("Placing in Zone 2\r\n");
+        } 
+				else if (target_zone->type == 3) 
+				{
+            // ä¸‰åŒºæ”¾ç½®é€»è¾‘
+            printf("Placing in Zone 3\r\n");
         }
-        
-        // ·µ»Ø°²È«Î»ÖÃ
-        move_to_position(MAIN_SHAFT_MAX_LENGTH,0.0f ,BIG_ARM_MAX_LENGTH,task1_xiaobi_angle );
+    }
 }
 
-void task2_rtos()
+/**
+ * @brief ä»»åŠ¡ä¸‰ï¼šéšæœºæ”¾ç½®
+ * @details æŠ“å–3ä¸ªå°çº¸ç®±ï¼Œæ”¾ç½®åˆ°3ä¸ªéšæœºä½ç½®
+ */
+static void task3_rtos(void)
 {
-	int chosen_target[4]={3,4,5,6};
-	for(int i = 0; i < 4; i++)
-	{
-		//ÉÔÎ¢Ì§Éı±ÜÃâÅö×²
-    move_to_position(task2_pickup_pos.radius, task2_pickup_pos.angle, i * SMALL_BOX_HEIGHT+20.0f,task1_xiaobi_angle);
-		// ×¥È¡Ğ¡Ö½Ïä	
-		move_to_position(task2_pickup_pos.radius, task2_pickup_pos.angle, i * SMALL_BOX_HEIGHT,task1_xiaobi_angle);
-    pickup_box();		
-    //ÉÔÎ¢Ì§Éı±ÜÃâÅö×²
-    move_to_position(task2_pickup_pos.radius, task2_pickup_pos.angle, i * SMALL_BOX_HEIGHT+20.0f,task1_xiaobi_angle);
-		if(task2_zones[chosen_target[i]].type==3)
-		{
-			//Æ¥ÅäÈıÇø²¢·ÅÖÃ
-		move_to_position(task2_zones[chosen_target[i]].pos.radius-task2_3_jian_radius,task2_zones[chosen_target[i]].pos.angle,task2_zones[chosen_target[i]].height+task2_3_jia_height,task2_3_xiaobi_angle);		
-		place_box();
-		}
-		else if(task2_zones[chosen_target[i]].type==3)
-		{
-			//Æ¥Åä¶şÇø²¢·ÅÖÃ
-		move_to_position(task2_zones[chosen_target[i]].pos.radius-150.0f,task2_zones[chosen_target[i]].pos.angle,task2_zones[chosen_target[i]].height+task2_3_jia_height,task2_2_xiaobi_angle);		
-		move_to_position(task2_zones[chosen_target[i]].pos.radius,task2_zones[chosen_target[i]].pos.angle,task2_zones[chosen_target[i]].height+task2_3_jia_height,task2_2_xiaobi_angle);		
-		}
-	
-	}
-	
-	
-				}
+    Task3Position_t random_positions[3];
+    uint8_t received_count = 0;
+    osStatus_t status;
 
-void task3_rtos()
-{
-	printf("OOK");
-    Task3Position_t positions[3];
-    uint8_t received_positions = 0;
+    printf("Task 3: Waiting for 3 positions...\r\n");
+
+    // 1. é˜»å¡å¼æ¥æ”¶ 3 ä¸ªéšæœºåæ ‡
+    //    ä½¿ç”¨ osWaitForever ç¡®ä¿ä»»åŠ¡åœ¨æ”¶åˆ°æ‰€æœ‰æ•°æ®å‰ä¸ä¼šæ‰§è¡Œ
+    while (received_count < 3)
+    {
+        // ä»é˜Ÿåˆ—ä¸­è·å–ä¸€ä¸ª Task3Position_t (å¤§å°ä¸º 8 å­—èŠ‚)
+        status = osMessageQueueGet(task3positionHandle, &random_positions[received_count], NULL, osWaitForever);
+        
+        if (status == osOK)
+        {
+            received_count++;
+            printf("Received position %d: R=%.1f, A=%.1f\r\n",
+                   received_count,
+                   random_positions[received_count - 1].radius,
+                   random_positions[received_count - 1].angle);
+        }
+    }
     
-    // µÈ´ı½ÓÊÕËùÓĞÈı¸öËæ»úÎ»ÖÃ
-    while (received_positions < 3) {
-        if (osMessageQueueGet(task3positionHandle, &positions[received_positions], NULL, osWaitForever) == osOK) {
-            received_positions++;
-					printf("OK");
-        }
-    }        
-        for (int i = 3; i > 0; i--) 
-        {
-						//ÉÔÎ¢Ì§Éı±ÜÃâÅö×²
-            move_to_position(task2_pickup_pos.radius, task2_pickup_pos.angle, i * SMALL_BOX_HEIGHT+20.0f,task1_xiaobi_angle);
-						// ×¥È¡Ğ¡Ö½Ïä	
-						move_to_position(task2_pickup_pos.radius, task2_pickup_pos.angle, i * SMALL_BOX_HEIGHT,task1_xiaobi_angle);
-            pickup_box();
-            //ÉÔÎ¢Ì§Éı±ÜÃâÅö×²
-						move_to_position(task2_pickup_pos.radius, task2_pickup_pos.angle, i * SMALL_BOX_HEIGHT+BIG_BOX_HEIGHT,task1_xiaobi_angle);
-            move_to_position(task2_pickup_pos.radius, task2_pickup_pos.angle, i * SMALL_BOX_HEIGHT+BIG_BOX_HEIGHT,task3_xiaobi_angle);
+    printf("All 3 positions received. Starting movement.\r\n");
 
-            // ·ÅÖÃµ½Ëæ»úÎ»ÖÃ
-            move_to_position(positions[i].radius-75.0f, positions[i].angle, i * SMALL_BOX_HEIGHT+BIG_BOX_HEIGHT,task3_xiaobi_angle);
-            move_to_position(positions[i].radius-75.0f, positions[i].angle, SMALL_BOX_HEIGHT+5.0f,task3_xiaobi_angle);
-            place_box();
-        }
-        
-        // ·µ»Ø°²È«Î»ÖÃ
-        move_to_position(300.0f, 0.0f, 0.0f,task1_xiaobi_angle);
-        
+    // 2. æŠ“å–å¹¶æ”¾ç½®
+    // æŠ“å–ä½ç½®åŒä»»åŠ¡äºŒ
+    for (int i = 0; i < 3; i++)
+    {
+        // 1. è®¡ç®—æŠ“å–é«˜åº¦ (ä»ä¸Šå¾€ä¸‹æŠ“)
+        float pickup_height = (3 - i) * SMALL_BOX_HEIGHT + 15.0f;	// ç•™å¤Ÿä½™é‡
+
+        // 2. æŠ“å–
+        /* * --- è¿åŠ¨å­¦ä»£ç  (æŠ“å–) ---
+         * * 1. ç§»åŠ¨åˆ° TASK2_PICKUP_POS (pickup_height + å®‰å…¨è£•é‡)
+         * 2. ç§»åŠ¨åˆ° TASK2_PICKUP_POS (pickup_height)
+         * 3. pickup_box()
+         * 4. æŠ¬å‡åˆ°å®‰å…¨é«˜åº¦
+         */
+
+        // 3. æ”¾ç½®
+        /* * --- è¿åŠ¨å­¦ä»£ç  (æ”¾ç½®) ---
+				 * 1. è§„åˆ™è¯´æ˜ï¼šå¤§çº¸ç®±æ‘†æ”¾ä¸ºéšæœºåæ ‡
+         * 2. è®¡ç®—æ”¾ç½®é«˜åº¦ï¼šå¾€å¤§çº¸ç®±é‡Œæ”¾å°çº¸ç®±
+         *
+         * 3. ç§»åŠ¨åˆ° random_positions[i].radius, random_positions[i].angle, 0.0f
+         * 4. place_box()
+         * 5. å›åˆ°å®‰å…¨ä½ç½®
+         */
+         
+         printf("Placing at random pos %d (R=%.1f, A=%.1f)\r\n", 
+								i, 
+                random_positions[i].radius, 
+                random_positions[i].angle);
+    }
 }
 
-/* ------------------------- ¹«¹²½Ó¿Úº¯Êı ------------------------- */
 
+/* ------------------------- å…¬å…±æ¥å£å‡½æ•°å®ç° ------------------------- */
+
+/**
+ * @brief (ä¾›UARTä¸­æ–­è°ƒç”¨) å‘é€ä»»åŠ¡ä¸‰çš„éšæœºä½ç½®åˆ°æ¶ˆæ¯é˜Ÿåˆ—
+ */
 void send_task3_positions(Task3Position_t positions[], uint8_t count)
 {
-    for (int i = 0; i < count && i < 3; i++) {
+    // åœ¨ä¸­æ–­ä¸­è°ƒç”¨ï¼Œä½¿ç”¨ 0 è¶…æ—¶
+    for (int i = 0; i < count && i < 3; i++)
+    {
         osMessageQueuePut(task3positionHandle, &positions[i], 0, 0);
     }
 }
 
-void stop_competition_task(osThreadId_t task_handle)
-{
-    if (task_handle != NULL) {
-        osThreadFlagsSet(task_handle, 0x0001);
-    }
-}
 
-/* ------------------------- Ë½ÓĞº¯ÊıÊµÏÖ ------------------------- */
+/* ------------------------- ç§æœ‰å‡½æ•°å®ç° (è¿åŠ¨å­¦å°è£…) ------------------------- */
 
 /**
- * @brief  ¿ØÖÆ»úĞµ±ÛÒÆ¶¯µ½Ö¸¶¨Î»ÖÃ
- * @param  radius: Ä¿±ê¾¶Ïò¾àÀë (mm)
- * @param  angle:  Ä¿±ê½Ç¶È (¶È)
- * @param  height: Ä¿±ê¸ß¶È (mm)
+ * @brief  æ§åˆ¶æœºæ¢°è‡‚ç§»åŠ¨åˆ°æŒ‡å®šä½ç½®
+ * @param  radius: ç›®æ ‡å¾„å‘è·ç¦» (mm)
+ * @param  angle:  ç›®æ ‡è§’åº¦ (åº¦)
+ * @param  height: ç›®æ ‡é«˜åº¦ (mm)
  */
-static void move_to_position(float radius, float angle, float height,float xiaobi_angle)
+static void move_to_position(float height, float radius, float chassis_angle,float suction_angle)
 {
-    
-    // ¿ØÖÆĞ¡±ÛĞı×ª£¨2006µç»ú£©
-    xiaobi_control(xiaobi_angle);
-		    // ¿ØÖÆÖ÷ÖáÉí³¤£¨3508µç»ú1£©
+    // æ§åˆ¶å°è‡‚æ—‹è½¬ï¼ˆ2006ç”µæœºï¼‰
+    xiaobi_control(suction_angle);
+		osDelay(1);
+		// æ§åˆ¶ä¸»è½´é«˜åº¦ï¼ˆ3508ç”µæœº1ï¼‰
     zhuzhou_control(height);
-	    //¿ØÖÆÖ÷ÖáĞı×ªµ½Ä¿±ê½Ç¶È£¨Ğ¡Ã×µç»ú£©
-    chassis_control(angle);
-    // ¿ØÖÆ´ó±ÛÉì³¤£¨3508µç»ú2£©
+		osDelay(1);
+	  // æ§åˆ¶åº•ç›˜æ—‹è½¬åˆ°ç›®æ ‡è§’åº¦ï¼ˆå°ç±³ç”µæœºï¼‰
+    chassis_control(chassis_angle);
+		osDelay(1);
+    // æ§åˆ¶å¾„å‘è·ç¦»ï¼ˆ3508ç”µæœº2ï¼‰
     dabi_control(radius);
-						while (!all_motors_in_position()) {
-							osDelay(10);
-						}						
+		while (!all_motors_in_position()) 
+		{
+				osDelay(10);
+		}						
 }
 
 
 /**
- * @brief  ×¥È¡Ö½Ïä²Ù×÷
- * @param  height: ×¥È¡¸ß¶È (mm)
+ * @brief  æŠ“å–çº¸ç®±æ“ä½œ
+ * @param  height: æŠ“å–é«˜åº¦ (mm)
  */
 static void pickup_box()
 {
-    // ÎüÅÌ×¥È¡
-xipan_control(1);
+    // å¸ç›˜æŠ“å–
+		xipan_control(1);
 }
 
 /**
- * @brief  ·ÅÖÃÖ½Ïä²Ù×÷
- * @param  height: ·ÅÖÃ¸ß¶È (mm)
+ * @brief  æ”¾ç½®çº¸ç®±æ“ä½œ
+ * @param  height: æ”¾ç½®é«˜åº¦ (mm)
  */
 static void place_box()
 {
-	//ÎüÅÌ·ÅÏÂ
-xipan_control(0);
+		//å¸ç›˜æ”¾ä¸‹
+		xipan_control(0);
 }

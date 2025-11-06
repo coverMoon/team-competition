@@ -28,7 +28,6 @@
 #include "fdcan_bsp.h"
 #include "dji_motor.h"
 #include "cybergear_motor.h"
-#include "Moter.h"
 #include "usart.h"
 #include "stdio.h"
 #include "string.h"
@@ -39,22 +38,16 @@
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
-#define buf_size 256
-#define TASK_NONE     0   
-#define TASK_1 1   
-#define TASK_2 2   
-#define TASK_3 3 
+
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-uint8_t rx_buffer[buf_size]; 
-volatile int16_t sys = TASK_NONE; 
-Task3Position_t position[3];
-#define POSITION_TOLERANCE  50       // DJI电机位置容差（编码器值）
-#define CHASSIS_TOLERANCE   0.01f    // 底盘电机位置容差（rad）
-#define WAIT_TIMEOUT_MS     5000     // 超时时间（ms）
-#define SUCTION_DELAY_MS    500      // 吸盘动作延迟
+#define buf_size 			256
+#define TASK_NONE     0   
+#define TASK_1 				1   
+#define TASK_2 				2   
+#define TASK_3 				3 
 
 /* USER CODE END PD */
 
@@ -65,35 +58,16 @@ Task3Position_t position[3];
 
 /* Private variables ---------------------------------------------------------*/
 /* USER CODE BEGIN Variables */
-
+uint8_t rx_buffer[buf_size]; 
+volatile int16_t sys = TASK_NONE; 
+TestPosition_t test = { 620.0f, 155.0f, 0.0f, 0.0f, 0 };
 /* USER CODE END Variables */
 /* Definitions for Task */
 osThreadId_t TaskHandle;
 const osThreadAttr_t Task_attributes = {
   .name = "Task",
   .priority = (osPriority_t) osPriorityNormal,
-  .stack_size = 128 * 4
-};
-/* Definitions for myTask02 */
-osThreadId_t myTask02Handle;
-const osThreadAttr_t myTask02_attributes = {
-  .name = "myTask02",
-  .priority = (osPriority_t) osPriorityLow,
-  .stack_size = 128 * 4
-};
-/* Definitions for myTask03 */
-osThreadId_t myTask03Handle;
-const osThreadAttr_t myTask03_attributes = {
-  .name = "myTask03",
-  .priority = (osPriority_t) osPriorityLow,
-  .stack_size = 128 * 4
-};
-/* Definitions for myTask04 */
-osThreadId_t myTask04Handle;
-const osThreadAttr_t myTask04_attributes = {
-  .name = "myTask04",
-  .priority = (osPriority_t) osPriorityLow,
-  .stack_size = 128 * 4
+  .stack_size = 256 * 4
 };
 /* Definitions for task3position */
 osMessageQueueId_t task3positionHandle;
@@ -112,9 +86,6 @@ const osMutexAttr_t motorMutex_attributes = {
 /* USER CODE END FunctionPrototypes */
 
 void Task0(void *argument);
-void ZhuzhouMonitor(void *argument);
-void DabiMonitor(void *argument);
-void ChassisMonitor(void *argument);
 
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 
@@ -128,7 +99,7 @@ void MX_FREERTOS_Init(void) {
 	fdcan_bsp_init();
 	HAL_UARTEx_ReceiveToIdle_DMA(&huart1, rx_buffer, buf_size);
 	trajectory_planner_init();
-    dji_motors_init();
+  dji_motors_init();
 	cybergear_motors_init();
 
 	fdcan_bsp_start(&hfdcan1);
@@ -153,7 +124,7 @@ void MX_FREERTOS_Init(void) {
 
   /* Create the queue(s) */
   /* creation of task3position */
-  task3positionHandle = osMessageQueueNew (16, sizeof(uint16_t), &task3position_attributes);
+  task3positionHandle = osMessageQueueNew (16, sizeof(Task3Position_t), &task3position_attributes);
 
   /* USER CODE BEGIN RTOS_QUEUES */
   /* add queues, ... */
@@ -162,15 +133,6 @@ void MX_FREERTOS_Init(void) {
   /* Create the thread(s) */
   /* creation of Task */
   TaskHandle = osThreadNew(Task0, NULL, &Task_attributes);
-
-  /* creation of myTask02 */
-  myTask02Handle = osThreadNew(ZhuzhouMonitor, NULL, &myTask02_attributes);
-
-  /* creation of myTask03 */
-  myTask03Handle = osThreadNew(DabiMonitor, NULL, &myTask03_attributes);
-
-  /* creation of myTask04 */
-  myTask04Handle = osThreadNew(ChassisMonitor, NULL, &myTask04_attributes);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
@@ -202,103 +164,89 @@ __weak void Task0(void *argument)
   /* USER CODE END Task0 */
 }
 
-/* USER CODE BEGIN Header_ZhuzhouMonitor */
-/**
-* @brief Function implementing the myTask02 thread.
-* @param argument: Not used
-* @retval None
-*/
-/* USER CODE END Header_ZhuzhouMonitor */
-__weak void ZhuzhouMonitor(void *argument)
-{
-  /* USER CODE BEGIN ZhuzhouMonitor */
-  /* Infinite loop */
-  for(;;)
-  {
-	  
-    osDelay(1);
-  }
-  /* USER CODE END ZhuzhouMonitor */
-}
-
-/* USER CODE BEGIN Header_DabiMonitor */
-/**
-* @brief Function implementing the myTask03 thread.
-* @param argument: Not used
-* @retval None
-*/
-/* USER CODE END Header_DabiMonitor */
-__weak void DabiMonitor(void *argument)
-{
-  /* USER CODE BEGIN DabiMonitor */
-  /* Infinite loop */
-  for(;;)
-  {
-    osDelay(1);
-  }
-  /* USER CODE END DabiMonitor */
-}
-
-/* USER CODE BEGIN Header_ChassisMonitor */
-/**
-* @brief Function implementing the myTask04 thread.
-* @param argument: Not used
-* @retval None
-*/
-/* USER CODE END Header_ChassisMonitor */
-__weak void ChassisMonitor(void *argument)
-{
-  /* USER CODE BEGIN ChassisMonitor */
-  /* Infinite loop */
-  for(;;)
-  {
-    osDelay(1);
-  }
-  /* USER CODE END ChassisMonitor */
-}
-
 /* Private application code --------------------------------------------------*/
 /* USER CODE BEGIN Application */
 void  HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t Size)
 {
-  if (huart == &huart1)
-  {
-    rx_buffer[Size]='\0';
-      printf("7");
-      if(rx_buffer[0] == 'a')
-      {
-          printf("a");
-      sys = TASK_1; 
-      }
-        else if(rx_buffer[0] == 'b')
-        {
-      sys = TASK_2; 
-                      printf("b");
+		// 确保是来自 huart1 的中断
+    if (huart == &huart1)
+    {
+        // 1. 将数据包末尾添加 null 终止符，以便 sscanf 等字符串函数安全解析
+        rx_buffer[Size] = '\0';
 
-        }
-        else if(rx_buffer[0] == 'c')
+        // 2. 解析指令
+        // 指令 'a': 启动任务一
+        if (rx_buffer[0] == 'a')
         {
-      sys = TASK_3; 
-                      printf("c");
-
+            sys = TASK_1;
         }
-      else if(rx_buffer[0] == 'F') 
+        // 指令 'b': 启动任务二
+        else if (rx_buffer[0] == 'b')
         {
-                    float number[20];
-                    sscanf((char*)rx_buffer,"F%fA%fS%fA%fL%fA%f",&number[0],&number[1],&number[2],&number[3],&number[4],&number[5]);
-        position[0].radius=number[0];
-        position[0].angle=number[1];
-        position[1].radius=number[2];
-        position[1].angle=number[3];
-        position[2].radius=number[4];
-        position[2].angle=number[5];
-        send_task3_positions(position,3);
-                              printf("f");
-
+            sys = TASK_2;
         }
-      HAL_UARTEx_ReceiveToIdle_DMA(&huart1, rx_buffer, buf_size);
-  
-}
+        // 指令 'c': 启动任务三
+        else if (rx_buffer[0] == 'c')
+        {
+            sys = TASK_3;
+        }
+        // 指令 'F': 任务三随机坐标 (格式: F<r1>A<a1>S<r2>A<a2>L<r3>A<a3>)
+        else if (rx_buffer[0] == 'F')
+        {
+            // 将变量定义在最小作用域 (回调函数内部)
+            int parsed_numbers[6]; // 存储解析出的6个整数
+            Task3Position_t local_positions[3]; // 存储转换后的3个坐标
+
+            // 尝试解析字符串
+            // 格式: F(radius1)A(angle1)S(radius2)A(angle2)L(radius3)A(angle3)
+            int parse_count = sscanf((char*)rx_buffer, "F%dA%dS%dA%dL%dA%d",
+                                     &parsed_numbers[0], &parsed_numbers[1],
+                                     &parsed_numbers[2], &parsed_numbers[3],
+                                     &parsed_numbers[4], &parsed_numbers[5]);
+
+            // 确保成功解析了所有 6 个数字
+            if (parse_count == 6)
+            {
+                // 将解析的整数转换为浮点数并填充结构体
+                local_positions[0].radius = (float)parsed_numbers[0];
+                local_positions[0].angle  = (float)parsed_numbers[1];
+                local_positions[1].radius = (float)parsed_numbers[2];
+                local_positions[1].angle  = (float)parsed_numbers[3];
+                local_positions[2].radius = (float)parsed_numbers[4];
+                local_positions[2].angle  = (float)parsed_numbers[5];
+
+                // 将解析到的坐标发送到消息队列 (在中断中，使用 0 超时)
+                send_task3_positions(local_positions, 3);
+            }
+            else
+            {
+                // 可选：添加解析失败的错误处理日志
+                // printf("UART Parse Error for Task 3 data\r\n");
+            }
+        }
+				// 指令 'T': 仅调试时使用，输入四个坐标传入test结构体
+				// 格式: T H<height> R<radius> C<chassis_angle> S<suction_angle> X<suction_switch>
+				if	(rx_buffer[0] == 'T')
+				{
+						int parsed_numbers[5]; // 存储解析出的5个整数
+						// 尝试解析字符串
+            // 格式: T H(height) R(radius) C(chassis_angle) S(suction_angle) X(suction_switch)
+            int parse_count = sscanf((char*)rx_buffer, "T H%d R%d C%d S%d X%d",
+                                     &parsed_numbers[0], &parsed_numbers[1],
+                                     &parsed_numbers[2], &parsed_numbers[3],
+																		 &parsed_numbers[4]);
+						
+						// 传入test结构体
+						test.height = (float)parsed_numbers[0];					// 主轴高度
+						test.radius = (float)parsed_numbers[1];					// 径向距离
+						test.chassis_angle = (float)parsed_numbers[2];	// 底盘角度
+						test.suction_angle = (float)parsed_numbers[3];	// 吸盘角度
+						test.suction_switch = parsed_numbers[4];				// 吸盘开关
+				}
+        
+        // 3. 重新启动 UART DMA 接收，准备接收下一条指令
+        HAL_UARTEx_ReceiveToIdle_DMA(&huart1, rx_buffer, buf_size);
     }
+}
 /* USER CODE END Application */
 

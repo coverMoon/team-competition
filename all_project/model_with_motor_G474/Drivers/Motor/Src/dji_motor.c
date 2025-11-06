@@ -118,7 +118,7 @@ void dji_motors_init(void)
     
     // 示例配置: 前4个电机在FDCAN1, 后4个在FDCAN2
     // PID参数直接从 pid.c 文件中迁移过来
-    dji_motor_configure(0, CAN_3508_2006_M1_ID, &hfdcan1, 
+    dji_motor_configure(0, CAN_3508_2006_M1_ID, &hfdcan2, 
 												0.15f, 0.001f, 0.035f, 
 												24.0f, 1.2f, 0.03f, 
 												500, -500, 9000, -9000);

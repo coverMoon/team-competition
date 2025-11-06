@@ -30,7 +30,7 @@
 #include "fdcan_bsp.h"
 #include "dji_motor.h"
 #include "cybergear_motor.h"
-#include "Moter.h"
+#include "actuator_control.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/

@@ -1,4 +1,4 @@
-#include "Moter.h"
+#include "actuator_control.h"
 
 #define buf_size 256               // UART½ÓÊÕ»º³åÇø´óĞ¡
 
@@ -27,23 +27,22 @@ static float target_pos = 0.0f;                          // µ×ÅÌÄ¿±êÎ»ÖÃ£¨rad£¬¹
  */
 void chassis_init(void)
 {
-    // »ñÈ¡µ×ÅÌµç»úÊµÀı£¨Ë÷Òı0¶ÔÓ¦ÅäÖÃµÄCyberGearµç»ú£©
-   mi_motor = cybergear_motor_get_instance(0);
+  // »ñÈ¡µ×ÅÌµç»úÊµÀı£¨Ë÷Òı0¶ÔÓ¦ÅäÖÃµÄCyberGearµç»ú£©
+  mi_motor = cybergear_motor_get_instance(0);
 	
 	vTaskDelay(pdMS_TO_TICKS(10));
 	cybergear_motor_stop(mi_motor);
 	vTaskDelay(pdMS_TO_TICKS(10));
 	cybergear_motor_set_mode(mi_motor, MOTOR_CONTROL_MODE_POSITION);
 	vTaskDelay(pdMS_TO_TICKS(10));
+	// µçÁ÷ÏŞ·ù£¨¿ÉÑ¡£©
 	//cybergear_motor_set_current_limit(mi_motor, 15.0f);
-	vTaskDelay(pdMS_TO_TICKS(10));
-	cybergear_motor_enable(mi_motor);
 	vTaskDelay(pdMS_TO_TICKS(10));
 	cybergear_motor_set_zero_position(mi_motor);
 	vTaskDelay(pdMS_TO_TICKS(10));
-  //cybergear_motor_set_speed(mi_motor, 6.28);
-	//vTaskDelay(pdMS_TO_TICKS(10));
-	trajectory_planner_start(mi_motor);                                            // µÈ´ıÎ»ÖÃÊı¾İ·´À¡
+	cybergear_motor_enable(mi_motor);
+	vTaskDelay(pdMS_TO_TICKS(10));
+	trajectory_planner_start(mi_motor);  // µÈ´ıÎ»ÖÃÊı¾İ·´À¡
 }
 
 /**
@@ -74,9 +73,9 @@ void chassis_control(float Angle)
  */
 void dji_init(void)
 {
-    dji_motor_zhuzhou = dji_motor_get_instance(2);  // »ñÈ¡Ö÷Öáµç»úÊµÀı£¨Ë÷Òı0£©
+    dji_motor_zhuzhou = dji_motor_get_instance(2);  // »ñÈ¡Ö÷Öáµç»úÊµÀı£¨Ë÷Òı2£©
     dji_motor_dabi = dji_motor_get_instance(1);     // »ñÈ¡´ó±Ûµç»úÊµÀı£¨Ë÷Òı1£©
-    dji_motor_xiaobi = dji_motor_get_instance(0);   // »ñÈ¡Ğ¡±Ûµç»úÊµÀı£¨Ë÷Òı4£©
+    dji_motor_xiaobi = dji_motor_get_instance(0);   // »ñÈ¡Ğ¡±Ûµç»úÊµÀı£¨Ë÷Òı0£©
 }
 
 /**
@@ -88,8 +87,8 @@ void dji_init(void)
  */
 void zhuzhou_control(float height)
 {
-    int32_t angle = dji_degree2encoder(height * 30);  // ¸ß¶È¡ú±àÂëÆ÷½Ç¶È»»Ëã£¨´ıµ÷ÊÔÈ·ÈÏ£©
-    dji_motor_set_location(dji_motor_zhuzhou, angle);  // ·¢ËÍÄ¿±êÎ»ÖÃÖ¸Áî
+		float angle = ((620.0f - height) / 100.6f * 360.0f * 19.0f);
+    dji_motor_set_location(dji_motor_zhuzhou, dji_degree2encoder(angle));  // ·¢ËÍÄ¿±êÎ»ÖÃÖ¸Áî
 }
 
 /**
@@ -100,7 +99,7 @@ void zhuzhou_control(float height)
  */
 void xiaobi_control(float angle)
 {
-    dji_motor_set_location(dji_motor_xiaobi, dji_degree2encoder(angle));  // ·¢ËÍĞ¡±ÛÄ¿±ê½Ç¶ÈÖ¸Áî
+    dji_motor_set_location(dji_motor_xiaobi, dji_degree2encoder(-angle) * 36);  // ·¢ËÍĞ¡±ÛÄ¿±ê½Ç¶ÈÖ¸Áî
 }
 
 /**
@@ -112,7 +111,8 @@ void xiaobi_control(float angle)
  */
 void dabi_control(float length)
 {
-    int32_t angle = dji_degree2encoder(length );  // ³¤¶È¡ú±àÂëÆ÷½Ç¶È»»Ëã£¨´ıµ÷ÊÔÈ·ÈÏ£©
+		float target = -((length - 155.0f) / 76.5f * 360.0f * 19.0f);
+    int32_t angle = dji_degree2encoder(target);  // ³¤¶È¡ú±àÂëÆ÷½Ç¶È»»Ëã£¨´ıµ÷ÊÔÈ·ÈÏ£©
     dji_motor_set_location(dji_motor_dabi, angle);  // ·¢ËÍÄ¿±êÎ»ÖÃÖ¸Áî
 }
 

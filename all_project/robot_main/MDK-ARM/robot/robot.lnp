@@ -34,7 +34,6 @@
 ".\robot\vesc.o"
 ".\robot\cybergear_motor.o"
 ".\robot\dji_motor.o"
-".\robot\moter.o"
 ".\robot\trajectory_planner.o"
 ".\robot\fdcan_bsp.o"
 ".\robot\croutine.o"
@@ -48,6 +47,7 @@
 ".\robot\heap_4.o"
 ".\robot\port.o"
 ".\robot\task_rtos.o"
+".\robot\actuator_control.o"
 --library_type=microlib --strict --scatter "stm32g474xx_flash.sct"
 --summary_stderr --info summarysizes --map --load_addr_map_info --xref --callgraph --symbols
 --info sizes --info totals --info unused --info veneers

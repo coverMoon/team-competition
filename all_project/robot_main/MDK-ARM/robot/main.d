@@ -51,7 +51,7 @@
   ..\Core\Inc\usart.h ..\Core\Inc\gpio.h \
   ..\Drivers\FDCAN_BSP\fdcan_bsp.h ..\Drivers\Motor\dji_motor.h \
   ..\Drivers\Control\pid.h ..\Drivers\Motor\cybergear_motor.h \
-  ..\Drivers\Motor\Moter.h \
+  ..\Drivers\Actuators\actuator_control.h \
   D:\Tools\keil_v5\Arm\ARMCLANG\include\string.h \
   D:\Tools\keil_v5\Arm\ARMCLANG\include\stdlib.h \
   ..\Drivers\Chassis\Inc\trajectory_planner.h \

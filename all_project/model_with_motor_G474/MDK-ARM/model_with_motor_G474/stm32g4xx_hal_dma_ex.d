@@ -8,12 +8,12 @@ model_with_motor_g474/stm32g4xx_hal_dma_ex.o: \
   ..\Drivers\CMSIS\Device\ST\STM32G4xx\Include\stm32g474xx.h \
   ..\Drivers\CMSIS\Include\core_cm4.h \
   D:\Tools\keil_v5\Arm\ARMCLANG\include\stdint.h \
-  E:\project\RoboCon\model_project\model_with_motor_G474\Drivers\CMSIS\Include\cmsis_version.h \
-  E:\project\RoboCon\model_project\model_with_motor_G474\Drivers\CMSIS\Include\cmsis_compiler.h \
-  E:\project\RoboCon\model_project\model_with_motor_G474\Drivers\CMSIS\Include\cmsis_armclang.h \
+  E:\project\RoboCon\team_competition\all_project\model_with_motor_G474\Drivers\CMSIS\Include\cmsis_version.h \
+  E:\project\RoboCon\team_competition\all_project\model_with_motor_G474\Drivers\CMSIS\Include\cmsis_compiler.h \
+  E:\project\RoboCon\team_competition\all_project\model_with_motor_G474\Drivers\CMSIS\Include\cmsis_armclang.h \
   D:\Tools\keil_v5\Arm\ARMCLANG\include\arm_compat.h \
   D:\Tools\keil_v5\Arm\ARMCLANG\include\arm_acle.h \
-  E:\project\RoboCon\model_project\model_with_motor_G474\Drivers\CMSIS\Include\mpu_armv7.h \
+  E:\project\RoboCon\team_competition\all_project\model_with_motor_G474\Drivers\CMSIS\Include\mpu_armv7.h \
   ..\Drivers\CMSIS\Device\ST\STM32G4xx\Include\system_stm32g4xx.h \
   ..\Drivers\STM32G4xx_HAL_Driver\Inc\Legacy\stm32_hal_legacy.h \
   D:\Tools\keil_v5\Arm\ARMCLANG\include\stddef.h \

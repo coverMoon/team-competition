@@ -48,7 +48,7 @@
   ..\Middlewares\Third_Party\FreeRTOS\Source\include\task.h \
   ..\Middlewares\Third_Party\FreeRTOS\Source\include\list.h \
   ..\Middlewares\Third_Party\FreeRTOS\Source\CMSIS_RTOS_V2\cmsis_os2.h \
-  ..\Drivers\Motor\Moter.h ..\Drivers\Motor\dji_motor.h \
+  ..\Drivers\Actuators\actuator_control.h ..\Drivers\Motor\dji_motor.h \
   ..\Drivers\Control\pid.h ..\Drivers\Motor\cybergear_motor.h \
   D:\Tools\keil_v5\Arm\ARMCLANG\include\string.h \
   D:\Tools\keil_v5\Arm\ARMCLANG\include\stdlib.h \

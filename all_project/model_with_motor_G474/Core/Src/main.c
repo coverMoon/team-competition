@@ -127,7 +127,7 @@ int main(void)
 	HAL_Delay(50);
   //cybergear_motor_set_speed(mi_motor, 6.28);
 	HAL_Delay(50);
-	
+	HAL_Delay(5000);
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -138,8 +138,10 @@ int main(void)
 
     /* USER CODE BEGIN 3 */
 		
-    cybergear_motor_set_position(mi_motor, cybergear_motor_degree2rad(180), 3.14);
-		HAL_Delay(100);
+//    cybergear_motor_set_position(mi_motor, cybergear_motor_degree2rad(180), 3.14);
+//		HAL_Delay(100);
+		
+		dji_motor_set_location(dji_motor_get_instance(0), dji_degree2encoder(90.0f * 36.0f));
 		
 		printf("current pos: %.2f\r\n", mi_motor->measure.angle / 2 / M_PI * 360.0f);
 		printf("current speed: %.2f rad/s\r\n", mi_motor->measure.speed);

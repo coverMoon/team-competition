@@ -49,10 +49,7 @@
   ..\Middlewares\Third_Party\FreeRTOS\Source\CMSIS_RTOS_V2\cmsis_os2.h \
   ..\Drivers\FDCAN_BSP\fdcan_bsp.h ..\Drivers\Motor\dji_motor.h \
   ..\Drivers\Control\pid.h ..\Drivers\Motor\cybergear_motor.h \
-  ..\Drivers\Motor\Moter.h \
-  D:\Tools\keil_v5\Arm\ARMCLANG\include\string.h \
+  ..\Core\Inc\usart.h D:\Tools\keil_v5\Arm\ARMCLANG\include\string.h \
   D:\Tools\keil_v5\Arm\ARMCLANG\include\stdlib.h \
   ..\Drivers\Chassis\Inc\trajectory_planner.h \
-  ..\Middlewares\Third_Party\FreeRTOS\Source\include\semphr.h \
-  ..\Middlewares\Third_Party\FreeRTOS\Source\include\queue.h \
-  ..\Core\Inc\usart.h ..\Drivers\task_rtos\task_rtos.h
+  ..\Drivers\task_rtos\task_rtos.h

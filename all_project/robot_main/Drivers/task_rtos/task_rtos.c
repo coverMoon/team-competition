@@ -26,16 +26,18 @@ typedef struct {
     int type;            // 区域类型 (1, 2, 3)
 } BoxZone_t;
 
+
 static const BoxZone_t TASK2_ZONES[] = {
-    {TASK2_ZONE1_POS_1, 90.0f, 1},  // 0: 一区
-    {TASK2_ZONE1_POS_2, 90.0f, 1},  // 1: 一区
-    {TASK2_ZONE1_POS_3, 90.0f, 1},  // 2: 一区
-    {TASK2_ZONE2_POS_1, 390.0f, 2}, // 3: 二区
-    {TASK2_ZONE2_POS_2, 390.0f, 2}, // 4: 二区
-    {TASK2_ZONE3_POS_1, 260.0f, 3}, // 5: 三区
-    {TASK2_ZONE3_POS_2, 260.0f, 3}, // 6: 三区
-    {TASK2_ZONE3_POS_3, 260.0f, 3}  // 7: 三区
+    {{350.0f, 0.0f},155.0f, 1},      // 一区：径向350mm、角度0°，放置高度155mm
+    {{350.0f, 45.0f}, 155.0f, 1},    // 一区：径向350mm、角度45°，放置高度155mm
+    {{350.0f, -45.0f}, 155.0f, 1},   // 一区：径向350mm、角度-45°，放置高度155mm
+    {{600.0f, 30.0f}, 390.0f, 2},    // 二区：径向600mm、角度30°，放置高度390mm
+    {{600.0f, -30.0f}, 390.0f, 2},   // 二区：径向600mm、角度-30°，放置高度390mm
+    {{550.0f, 0.0f}, 260.0f, 3},     // 三区：径向550mm、角度0°，放置高度260mm
+    {{550.0f, 60.0f}, 260.0f, 3},    // 三区：径向550mm、角度60°，放置高度260mm
+    {{550.0f, -60.0f}, 260.0f, 3}    // 三区：径向550mm、角度-60°，放置高度260mm
 };
+
 
 
 /* ------------------------- 私有函数声明 ------------------------- */
@@ -67,11 +69,6 @@ void Task0(void *argument)
     /* 无限循环：任务调度逻辑 */
     for (;;)
     {
-				/*--------------------- 参数测试 --------------------*/
-				move_to_position(test.height, test.radius, test.chassis_angle, test.suction_angle);
-				xipan_control(test.suction_switch);
-				/*---------------------------------------------------*/
-				
         // 仅当无任务运行且sys指定有效任务时，启动新任务
         if (!is_task_running && sys != TASK_NONE)
         {
@@ -127,13 +124,19 @@ static void task1_rtos(void)
      * 13. ...
      * 14. 重复抓取 TASK1_BOX_POS_3 并放置在 (高度 2*SMALL_BOX_HEIGHT)
      */
-     
-    // 示例
-    // move_to_position(TASK1_BOX_POS_1.radius, TASK1_BOX_POS_1.angle, 20.0f, 0.0f);
-    // pickup_box();
-    // move_to_position(TASK1_TARGET_POS.radius, TASK1_TARGET_POS.angle, 0.0f, 0.0f);
-    // place_box();
-
+ for (int i = 0; i < 3; i++) 
+    {
+			// 1. 移动到抓取位置安全高度
+			move_to_position(SMALL_BOX_HEIGHT + 15.0f,task1_boxes[i].radius, task1_boxes[i].angle, 0.0f);
+			// 2. 下降到抓取高度并抓取
+			move_to_position(SMALL_BOX_HEIGHT,task1_boxes[i].radius, task1_boxes[i].angle, 0.0f);
+			pickup_box();
+			// 3. 移动到目标位置安全高度
+			move_to_position(i * SMALL_BOX_HEIGHT + 20.0f,TASK1_TARGET_POS.radius,TASK1_TARGET_POS.angle, 0.0f);
+			// 4. 下降到放置高度并放置
+			move_to_position(i * SMALL_BOX_HEIGHT,TASK1_TARGET_POS.radius,TASK1_TARGET_POS.angle,0.0f);
+			place_box();
+    }
     printf("Task 1 logic not implemented.\r\n");
 }
 
@@ -144,8 +147,7 @@ static void task1_rtos(void)
 static void task2_rtos(void)
 {
     // 策略：选择要放置的4个目标区域的索引 (0-7)
-    // 示例：选择 0, 3, 5, 6
-    int chosen_target_indices[4] = {0, 3, 5, 6};
+    int chosen_target[4] = {3,4,5,6};
 
     for (int i = 0; i < 4; i++)
     {
@@ -153,18 +155,15 @@ static void task2_rtos(void)
         // 抓取第 i 个箱子 (从0开始)，每个高 SMALL_BOX_HEIGHT
         // 注意：从上往下抓取 (第0个在最上)
         float pickup_height = (4 - i) * SMALL_BOX_HEIGHT + 15.0f;		// 留够余量
-        
-        // 2. 抓取
-        /* * --- 运动学代码 (抓取) ---
-         *
-         * 1. 移动到 TASK2_PICKUP_POS 上方 (pickup_height + 安全裕量)
-         * 2. 移动到 TASK2_PICKUP_POS (pickup_height)
-         * 3. pickup_box()
-         * 4. 抬升到安全高度
-         */
-        
+			  // 1. 移动到抓取位置上方安全高度（随层数递增）
+        move_to_position(pickup_height,TASK2_PICKUP_POS.radius,TASK2_PICKUP_POS.angle,0.0f);
+        // 2. 下降到抓取高度，吸起箱子
+        move_to_position((4 - i) * SMALL_BOX_HEIGHT,TASK2_PICKUP_POS.radius,TASK2_PICKUP_POS.angle,0.0f);
+        pickup_box();
+        // 3. 抬升20mm，防碰撞
+        move_to_position(pickup_height, TASK2_PICKUP_POS.radius,TASK2_PICKUP_POS.angle,0.0f);
         // 3. 获取目标位置信息
-        int target_index = chosen_target_indices[i];
+        int target_index = chosen_target[i];
         const BoxZone_t* target_zone = &TASK2_ZONES[target_index];
 
         // 4. 放置
@@ -186,11 +185,23 @@ static void task2_rtos(void)
 				else if (target_zone->type == 2) 
 				{
             // 二区放置逻辑
+					  // 第一步：预定位（径向减150mm，防碰撞）
+            move_to_position(target_zone->height_offset ,target_zone->pos.radius - 150.0f,target_zone->pos.angle,75.0f);
+            // 第二步：精准定位到目标位置
+            move_to_position(target_zone->height_offset ,target_zone->pos.radius,target_zone->pos.angle,75.0f);
+            place_box();
+            // 抬升安全高度
+            move_to_position(target_zone->height_offset  + 20.0f,target_zone->pos.radius,target_zone->pos.angle,75.0f);
             printf("Placing in Zone 2\r\n");
         } 
 				else if (target_zone->type == 3) 
 				{
             // 三区放置逻辑
+					  move_to_position(target_zone->height_offset,target_zone->pos.radius - 180.0f,target_zone->pos.angle,90.0f);
+					  move_to_position(target_zone->height_offset,target_zone->pos.radius,target_zone->pos.angle,90.0f);
+            place_box();
+            // 放置后抬升20mm
+            move_to_position(target_zone->height_offset,target_zone->pos.radius - 180.0f,target_zone->pos.angle,90.0f);
             printf("Placing in Zone 3\r\n");
         }
     }
@@ -232,7 +243,6 @@ static void task3_rtos(void)
     for (int i = 0; i < 3; i++)
     {
         // 1. 计算抓取高度 (从上往下抓)
-        float pickup_height = (3 - i) * SMALL_BOX_HEIGHT + 15.0f;	// 留够余量
 
         // 2. 抓取
         /* * --- 运动学代码 (抓取) ---
@@ -251,6 +261,23 @@ static void task3_rtos(void)
          * 4. place_box()
          * 5. 回到安全位置
          */
+			// 1. 移动到抓取位置上方安全高度
+        move_to_position(i * SMALL_BOX_HEIGHT + 20.0f,TASK2_PICKUP_POS.radius,TASK2_PICKUP_POS.angle,0.0f);
+        
+        // 2. 下降到抓取高度，吸起箱子
+        move_to_position(i * SMALL_BOX_HEIGHT,TASK2_PICKUP_POS.radius,TASK2_PICKUP_POS.angle,0.0f);
+        pickup_box();
+        
+        // 3. 抬升（叠加大纸箱高度)
+        move_to_position(i * SMALL_BOX_HEIGHT + BIG_BOX_HEIGHT,TASK2_PICKUP_POS.radius,TASK2_PICKUP_POS.angle,0.0f);
+        move_to_position(i * SMALL_BOX_HEIGHT + BIG_BOX_HEIGHT,TASK2_PICKUP_POS.radius,TASK2_PICKUP_POS.angle,0.0f);
+
+        // 4. 移动到随机位置的补偿位
+        move_to_position(i * SMALL_BOX_HEIGHT + BIG_BOX_HEIGHT,random_positions[i].radius,random_positions[i].angle,0.0f);
+        
+        // 5. 下降到放置高度，松开箱子
+        move_to_position(SMALL_BOX_HEIGHT + 5.0f,random_positions[i].radius,random_positions[i].angle,0.0f);
+        place_box();
          
          printf("Placing at random pos %d (R=%.1f, A=%.1f)\r\n", 
 								i, 

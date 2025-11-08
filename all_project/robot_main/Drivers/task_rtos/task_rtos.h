@@ -34,32 +34,35 @@ typedef struct {
 
 
 /* ------------------------- 比赛规则常量定义 ------------------------- */
+//限位
+#define MAX_HEIGHT 620.0f // 最大高度
+#define MIN_HEIGHT 140.0f // 最小高度
 
 // 纸箱尺寸
 #define SMALL_BOX_HEIGHT 150.0f // 小纸箱高度 (mm) 
 #define BIG_BOX_HEIGHT   180.0f // 大纸箱高度 (mm) 
 
 // 任务一：箱子堆叠
-static const PolarCoord_t TASK1_BOX_POS_1 = {450.0f, 60.0f};  // (450mm, +60°) 
-static const PolarCoord_t TASK1_BOX_POS_2 = {350.0f, 45.0f};  // (350mm, +45°) 
-static const PolarCoord_t TASK1_BOX_POS_3 = {400.0f, -30.0f}; // (400mm, -30°) 
+static const PolarCoord_t task1_boxes[3] = {{450.0f, 60.0f},  // (450mm, +60°) 
+                                            {350.0f, 45.0f}, // (350mm, +45°) 
+                                            {400.0f, -30.0f}}; // (400mm, -30°) 
 static const PolarCoord_t TASK1_TARGET_POS = {350.0f, -90.0f}; // (350mm, -90°) 
 
 // 任务二：定点放置
 static const PolarCoord_t TASK2_PICKUP_POS = {350.0f, 180.0f}; // 小纸箱叠放位置
 
-// 任务二 目标区域 (为简化，这里只列出坐标，高度和类型在 .c 文件中定义)
-// 一区
-static const PolarCoord_t TASK2_ZONE1_POS_1 = {350.0f, 0.0f};
-static const PolarCoord_t TASK2_ZONE1_POS_2 = {350.0f, 45.0f};
-static const PolarCoord_t TASK2_ZONE1_POS_3 = {350.0f, -45.0f};
-// 二区
-static const PolarCoord_t TASK2_ZONE2_POS_1 = {600.0f, 30.0f};
-static const PolarCoord_t TASK2_ZONE2_POS_2 = {600.0f, -30.0f};
-// 三区
-static const PolarCoord_t TASK2_ZONE3_POS_1 = {550.0f, 0.0f};
-static const PolarCoord_t TASK2_ZONE3_POS_2 = {550.0f, 60.0f};
-static const PolarCoord_t TASK2_ZONE3_POS_3 = {550.0f, -60.0f};
+//// 任务二 目标区域 (为简化，这里只列出坐标，高度和类型在 .c 文件中定义)
+//// 一区
+//static const PolarCoord_t TASK2_ZONE1_POS_1 = {350.0f, 0.0f};
+//static const PolarCoord_t TASK2_ZONE1_POS_2 = {350.0f, 45.0f};
+//static const PolarCoord_t TASK2_ZONE1_POS_3 = {350.0f, -45.0f};
+//// 二区
+//static const PolarCoord_t TASK2_ZONE2_POS_1 = {600.0f, 30.0f};
+//static const PolarCoord_t TASK2_ZONE2_POS_2 = {600.0f, -30.0f};
+//// 三区
+//static const PolarCoord_t TASK2_ZONE3_POS_1 = {550.0f, 0.0f};
+//static const PolarCoord_t TASK2_ZONE3_POS_2 = {550.0f, 60.0f};
+//static const PolarCoord_t TASK2_ZONE3_POS_3 = {550.0f, -60.0f};
 
 
 /* ------------------------- FreeRTOS 对象外部声明 ------------------------- */

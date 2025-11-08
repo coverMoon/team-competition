@@ -31,11 +31,11 @@ static const BoxZone_t TASK2_ZONES[] = {
     {{350.0f, 0.0f},155.0f, 1},      // 一区：径向350mm、角度0°，放置高度155mm
     {{350.0f, 45.0f}, 155.0f, 1},    // 一区：径向350mm、角度45°，放置高度155mm
     {{350.0f, -45.0f}, 155.0f, 1},   // 一区：径向350mm、角度-45°，放置高度155mm
-    {{600.0f, 30.0f}, 390.0f, 2},    // 二区：径向600mm、角度30°，放置高度390mm
-    {{600.0f, -30.0f}, 390.0f, 2},   // 二区：径向600mm、角度-30°，放置高度390mm
-    {{550.0f, 0.0f}, 260.0f, 3},     // 三区：径向550mm、角度0°，放置高度260mm
-    {{550.0f, 60.0f}, 260.0f, 3},    // 三区：径向550mm、角度60°，放置高度260mm
-    {{550.0f, -60.0f}, 260.0f, 3}    // 三区：径向550mm、角度-60°，放置高度260mm
+    {{425.0f, 30.0f}, 390.0f, 2},    // 二区：径向600mm、角度30°，放置高度390mm
+    {{425.0f, -30.0f}, 390.0f, 2},   // 二区：径向600mm、角度-30°，放置高度390mm
+    {{425.0f, 0.0f}, 260.0f, 3},     // 三区：径向550mm、角度0°，放置高度260mm
+    {{425.0f, 60.0f}, 260.0f, 3},    // 三区：径向550mm、角度60°，放置高度260mm
+    {{425.0f, -60.0f}, 260.0f, 3}    // 三区：径向550mm、角度-60°，放置高度260mm
 };
 
 
@@ -69,6 +69,7 @@ void Task0(void *argument)
     /* 无限循环：任务调度逻辑 */
     for (;;)
     {
+//			xipan_control(1);
         // 仅当无任务运行且sys指定有效任务时，启动新任务
         if (!is_task_running && sys != TASK_NONE)
         {
@@ -126,15 +127,18 @@ static void task1_rtos(void)
      */
  for (int i = 0; i < 3; i++) 
     {
+			int times = i + 1;
+			// 0.  返回安全高度
+			move_to_position(times * SMALL_BOX_HEIGHT + 20.0f,task1_boxes[i].radius,task1_boxes[i].angle, 0.0f);
 			// 1. 移动到抓取位置安全高度
 			move_to_position(SMALL_BOX_HEIGHT + 15.0f,task1_boxes[i].radius, task1_boxes[i].angle, 0.0f);
 			// 2. 下降到抓取高度并抓取
-			move_to_position(SMALL_BOX_HEIGHT,task1_boxes[i].radius, task1_boxes[i].angle, 0.0f);
+			move_to_position(SMALL_BOX_HEIGHT-10.0f,task1_boxes[i].radius, task1_boxes[i].angle, 0.0f);
 			pickup_box();
 			// 3. 移动到目标位置安全高度
-			move_to_position(i * SMALL_BOX_HEIGHT + 20.0f,TASK1_TARGET_POS.radius,TASK1_TARGET_POS.angle, 0.0f);
+			move_to_position(times * SMALL_BOX_HEIGHT + 20.0f,TASK1_TARGET_POS.radius,TASK1_TARGET_POS.angle, 0.0f);
 			// 4. 下降到放置高度并放置
-			move_to_position(i * SMALL_BOX_HEIGHT,TASK1_TARGET_POS.radius,TASK1_TARGET_POS.angle,0.0f);
+			move_to_position(times * SMALL_BOX_HEIGHT+ 5.0f,TASK1_TARGET_POS.radius,TASK1_TARGET_POS.angle,0.0f);
 			place_box();
     }
     printf("Task 1 logic not implemented.\r\n");
@@ -186,22 +190,22 @@ static void task2_rtos(void)
 				{
             // 二区放置逻辑
 					  // 第一步：预定位（径向减150mm，防碰撞）
-            move_to_position(target_zone->height_offset ,target_zone->pos.radius - 150.0f,target_zone->pos.angle,75.0f);
+            move_to_position(target_zone->height_offset ,target_zone->pos.radius - 150.0f,target_zone->pos.angle,90.0f);
             // 第二步：精准定位到目标位置
-            move_to_position(target_zone->height_offset ,target_zone->pos.radius,target_zone->pos.angle,75.0f);
+            move_to_position(target_zone->height_offset ,target_zone->pos.radius,target_zone->pos.angle,90.0f);
             place_box();
             // 抬升安全高度
-            move_to_position(target_zone->height_offset  + 20.0f,target_zone->pos.radius,target_zone->pos.angle,75.0f);
+            move_to_position(target_zone->height_offset,target_zone->pos.radius - 75.0f,target_zone->pos.angle,90.0f);
             printf("Placing in Zone 2\r\n");
         } 
 				else if (target_zone->type == 3) 
 				{
             // 三区放置逻辑
-					  move_to_position(target_zone->height_offset,target_zone->pos.radius - 180.0f,target_zone->pos.angle,90.0f);
-					  move_to_position(target_zone->height_offset,target_zone->pos.radius,target_zone->pos.angle,90.0f);
+					  move_to_position(target_zone->height_offset-180.0f,target_zone->pos.radius,target_zone->pos.angle,75.0f);
+					  move_to_position(target_zone->height_offset,target_zone->pos.radius,target_zone->pos.angle,75.0f);
             place_box();
             // 放置后抬升20mm
-            move_to_position(target_zone->height_offset,target_zone->pos.radius - 180.0f,target_zone->pos.angle,90.0f);
+            move_to_position(target_zone->height_offset,target_zone->pos.radius - 180.0f,target_zone->pos.angle,75.0f);
             printf("Placing in Zone 3\r\n");
         }
     }
@@ -243,8 +247,8 @@ static void task3_rtos(void)
     for (int i = 0; i < 3; i++)
     {
         // 1. 计算抓取高度 (从上往下抓)
-
-        // 2. 抓取
+        float pickup_height = (3 - i) * SMALL_BOX_HEIGHT + 15.0f;
+   			// 2. 抓取
         /* * --- 运动学代码 (抓取) ---
          * * 1. 移动到 TASK2_PICKUP_POS (pickup_height + 安全裕量)
          * 2. 移动到 TASK2_PICKUP_POS (pickup_height)
@@ -262,20 +266,16 @@ static void task3_rtos(void)
          * 5. 回到安全位置
          */
 			// 1. 移动到抓取位置上方安全高度
-        move_to_position(i * SMALL_BOX_HEIGHT + 20.0f,TASK2_PICKUP_POS.radius,TASK2_PICKUP_POS.angle,0.0f);
+        move_to_position( pickup_height + 20.0f,TASK2_PICKUP_POS.radius,TASK2_PICKUP_POS.angle,0.0f);
         
         // 2. 下降到抓取高度，吸起箱子
-        move_to_position(i * SMALL_BOX_HEIGHT,TASK2_PICKUP_POS.radius,TASK2_PICKUP_POS.angle,0.0f);
+        move_to_position(pickup_height,TASK2_PICKUP_POS.radius,TASK2_PICKUP_POS.angle,0.0f);
         pickup_box();
         
-        // 3. 抬升（叠加大纸箱高度)
-        move_to_position(i * SMALL_BOX_HEIGHT + BIG_BOX_HEIGHT,TASK2_PICKUP_POS.radius,TASK2_PICKUP_POS.angle,0.0f);
-        move_to_position(i * SMALL_BOX_HEIGHT + BIG_BOX_HEIGHT,TASK2_PICKUP_POS.radius,TASK2_PICKUP_POS.angle,0.0f);
-
-        // 4. 移动到随机位置的补偿位
-        move_to_position(i * SMALL_BOX_HEIGHT + BIG_BOX_HEIGHT,random_positions[i].radius,random_positions[i].angle,0.0f);
+        // 3. 移动到随机位置的补偿位
+        move_to_position( pickup_height ,random_positions[i].radius,random_positions[i].angle,0.0f);
         
-        // 5. 下降到放置高度，松开箱子
+        // 4. 下降到放置高度，松开箱子
         move_to_position(SMALL_BOX_HEIGHT + 5.0f,random_positions[i].radius,random_positions[i].angle,0.0f);
         place_box();
          
@@ -313,11 +313,16 @@ void send_task3_positions(Task3Position_t positions[], uint8_t count)
 static void move_to_position(float height, float radius, float chassis_angle,float suction_angle)
 {
     // 控制小臂旋转（2006电机）
+	zhuzhou_control(height);
+		osDelay(1);
+	while (!all_motors_in_position()) 
+		{
+				osDelay(10);
+		}		
     xiaobi_control(suction_angle);
 		osDelay(1);
 		// 控制主轴高度（3508电机1）
-    zhuzhou_control(height);
-		osDelay(1);
+    
 	  // 控制底盘旋转到目标角度（小米电机）
     chassis_control(chassis_angle);
 		osDelay(1);
@@ -338,6 +343,7 @@ static void pickup_box()
 {
     // 吸盘抓取
 		xipan_control(1);
+	osDelay(3000);
 }
 
 /**
@@ -348,4 +354,5 @@ static void place_box()
 {
 		//吸盘放下
 		xipan_control(0);
+	osDelay(3000);
 }

@@ -3,7 +3,7 @@
 <title>Static Call Graph - [.\robot\robot.axf]</title></head>
 <body><HR>
 <H1>Static Call Graph for image .\robot\robot.axf</H1><HR>
-<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 6190004: Last Updated: Sat Nov  8 00:04:18 2025
+<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 6190004: Last Updated: Sat Nov  8 11:57:41 2025
 <BR><P>
 <H3>Maximum Stack Usage =        304 bytes + Unknown(Cycles, Untraceable Function Pointers)</H3><H3>
 Call chain for Maximum Stack Depth:</H3>
@@ -540,7 +540,7 @@ Global Symbols
 <LI><a href="#[15e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_fp_digits
 </UL>
 
-<P><STRONG><a name="[fc]"></a>__aeabi_f2d</STRONG> (Thumb, 38 bytes, Stack size 0 bytes, f2d.o(.text))
+<P><STRONG><a name="[fd]"></a>__aeabi_f2d</STRONG> (Thumb, 38 bytes, Stack size 0 bytes, f2d.o(.text))
 <BR><BR>[Called By]<UL><LI><a href="#[10c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;cybergear_motor_degree2rad
 <LI><a href="#[77]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Task0
 </UL>
@@ -1428,22 +1428,22 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[bd]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_TIM_Base_Init
 </UL>
 
-<P><STRONG><a name="[77]"></a>Task0</STRONG> (Thumb, 4320 bytes, Stack size 32 bytes, task_rtos.o(.text.Task0))
+<P><STRONG><a name="[77]"></a>Task0</STRONG> (Thumb, 5732 bytes, Stack size 32 bytes, task_rtos.o(.text.Task0))
 <BR><BR>[Stack]<UL><LI>Max Depth = 272<LI>Call Chain = Task0 &rArr; chassis_init &rArr; cybergear_motor_set_mode &rArr; cybergear_motor_stop &rArr; xQueueGenericSend &rArr; xTaskResumeAll &rArr; xTaskIncrementTick
 </UL>
-<BR>[Calls]<UL><LI><a href="#[fe]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;osDelay
-<LI><a href="#[fc]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_f2d
+<BR>[Calls]<UL><LI><a href="#[fc]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;osDelay
+<LI><a href="#[fd]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_f2d
 <LI><a href="#[104]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;puts
-<LI><a href="#[103]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;all_motors_in_position
-<LI><a href="#[102]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;dabi_control
-<LI><a href="#[101]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;chassis_control
-<LI><a href="#[100]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;zhuzhou_control
-<LI><a href="#[ff]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;xiaobi_control
+<LI><a href="#[103]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;dabi_control
+<LI><a href="#[102]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;chassis_control
+<LI><a href="#[101]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;xiaobi_control
+<LI><a href="#[100]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;all_motors_in_position
+<LI><a href="#[ff]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;zhuzhou_control
 <LI><a href="#[fb]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;xipan_control
 <LI><a href="#[fa]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;dji_init
 <LI><a href="#[f9]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;chassis_init
 <LI><a href="#[105]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;osMessageQueueGet
-<LI><a href="#[fd]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__2printf
+<LI><a href="#[fe]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__2printf
 </UL>
 <BR>[Address Reference Count : 1]<UL><LI> app_freertos.o(.text.MX_FREERTOS_Init)
 </UL>
@@ -1503,11 +1503,11 @@ Global Symbols
 </UL>
 <BR>[Address Reference Count : 1]<UL><LI> startup_stm32g474xx.o(RESET)
 </UL>
-<P><STRONG><a name="[103]"></a>all_motors_in_position</STRONG> (Thumb, 108 bytes, Stack size 0 bytes, actuator_control.o(.text.all_motors_in_position))
+<P><STRONG><a name="[100]"></a>all_motors_in_position</STRONG> (Thumb, 108 bytes, Stack size 0 bytes, actuator_control.o(.text.all_motors_in_position))
 <BR><BR>[Called By]<UL><LI><a href="#[77]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Task0
 </UL>
 
-<P><STRONG><a name="[101]"></a>chassis_control</STRONG> (Thumb, 40 bytes, Stack size 16 bytes, actuator_control.o(.text.chassis_control))
+<P><STRONG><a name="[102]"></a>chassis_control</STRONG> (Thumb, 40 bytes, Stack size 16 bytes, actuator_control.o(.text.chassis_control))
 <BR><BR>[Stack]<UL><LI>Max Depth = 136<LI>Call Chain = chassis_control &rArr; trajectory_planner_set_target &rArr; xQueueGenericSend &rArr; xTaskResumeAll &rArr; xTaskIncrementTick
 </UL>
 <BR>[Calls]<UL><LI><a href="#[10d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;trajectory_planner_set_target
@@ -1538,9 +1538,9 @@ Global Symbols
 </UL>
 <BR>[Calls]<UL><LI><a href="#[90]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_d2f
 <LI><a href="#[8e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_dmul
-<LI><a href="#[fc]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_f2d
+<LI><a href="#[fd]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_f2d
 </UL>
-<BR>[Called By]<UL><LI><a href="#[101]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;chassis_control
+<BR>[Called By]<UL><LI><a href="#[102]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;chassis_control
 </UL>
 
 <P><STRONG><a name="[113]"></a>cybergear_motor_enable</STRONG> (Thumb, 108 bytes, Stack size 64 bytes, cybergear_motor.o(.text.cybergear_motor_enable))
@@ -1610,7 +1610,7 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[e6]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;MX_FREERTOS_Init
 </UL>
 
-<P><STRONG><a name="[102]"></a>dabi_control</STRONG> (Thumb, 76 bytes, Stack size 8 bytes, actuator_control.o(.text.dabi_control))
+<P><STRONG><a name="[103]"></a>dabi_control</STRONG> (Thumb, 76 bytes, Stack size 8 bytes, actuator_control.o(.text.dabi_control))
 <BR><BR>[Stack]<UL><LI>Max Depth = 24<LI>Call Chain = dabi_control &rArr; dji_motor_set_location
 </UL>
 <BR>[Calls]<UL><LI><a href="#[11d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;dji_motor_set_location
@@ -1620,9 +1620,9 @@ Global Symbols
 </UL>
 
 <P><STRONG><a name="[11c]"></a>dji_degree2encoder</STRONG> (Thumb, 24 bytes, Stack size 0 bytes, dji_motor.o(.text.dji_degree2encoder))
-<BR><BR>[Called By]<UL><LI><a href="#[102]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;dabi_control
-<LI><a href="#[100]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;zhuzhou_control
-<LI><a href="#[ff]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;xiaobi_control
+<BR><BR>[Called By]<UL><LI><a href="#[103]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;dabi_control
+<LI><a href="#[101]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;xiaobi_control
+<LI><a href="#[ff]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;zhuzhou_control
 </UL>
 
 <P><STRONG><a name="[fa]"></a>dji_init</STRONG> (Thumb, 36 bytes, Stack size 8 bytes, actuator_control.o(.text.dji_init))
@@ -1653,9 +1653,9 @@ Global Symbols
 <BR>[Calls]<UL><LI><a href="#[121]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;vPortExitCritical
 <LI><a href="#[120]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;vPortEnterCritical
 </UL>
-<BR>[Called By]<UL><LI><a href="#[102]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;dabi_control
-<LI><a href="#[100]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;zhuzhou_control
-<LI><a href="#[ff]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;xiaobi_control
+<BR>[Called By]<UL><LI><a href="#[103]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;dabi_control
+<LI><a href="#[101]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;xiaobi_control
+<LI><a href="#[ff]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;zhuzhou_control
 </UL>
 
 <P><STRONG><a name="[e9]"></a>dji_motors_init</STRONG> (Thumb, 402 bytes, Stack size 56 bytes, dji_motor.o(.text.dji_motors_init))
@@ -1723,7 +1723,7 @@ Global Symbols
 </UL>
 <BR>[Address Reference Count : 1]<UL><LI> entry9a.o(.ARM.Collect$$$$0000000B)
 </UL>
-<P><STRONG><a name="[fe]"></a>osDelay</STRONG> (Thumb, 32 bytes, Stack size 8 bytes, cmsis_os2.o(.text.osDelay))
+<P><STRONG><a name="[fc]"></a>osDelay</STRONG> (Thumb, 32 bytes, Stack size 8 bytes, cmsis_os2.o(.text.osDelay))
 <BR><BR>[Stack]<UL><LI>Max Depth = 80<LI>Call Chain = osDelay &rArr; vTaskDelay &rArr; xTaskResumeAll &rArr; xTaskIncrementTick
 </UL>
 <BR>[Calls]<UL><LI><a href="#[10f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;vTaskDelay
@@ -1833,7 +1833,7 @@ Global Symbols
 <BR>[Calls]<UL><LI><a href="#[117]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;xQueueGenericSend
 <LI><a href="#[115]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;xQueueSemaphoreTake
 </UL>
-<BR>[Called By]<UL><LI><a href="#[101]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;chassis_control
+<BR>[Called By]<UL><LI><a href="#[102]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;chassis_control
 </UL>
 
 <P><STRONG><a name="[114]"></a>trajectory_planner_start</STRONG> (Thumb, 74 bytes, Stack size 16 bytes, trajectory_planner.o(.text.trajectory_planner_start))
@@ -1992,7 +1992,7 @@ Global Symbols
 <LI><a href="#[141]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;vListInsert
 <LI><a href="#[140]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;xTaskResumeAll
 </UL>
-<BR>[Called By]<UL><LI><a href="#[fe]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;osDelay
+<BR>[Called By]<UL><LI><a href="#[fc]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;osDelay
 <LI><a href="#[f9]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;chassis_init
 </UL>
 
@@ -2382,7 +2382,7 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[12b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;vTaskStartScheduler
 </UL>
 
-<P><STRONG><a name="[ff]"></a>xiaobi_control</STRONG> (Thumb, 36 bytes, Stack size 8 bytes, actuator_control.o(.text.xiaobi_control))
+<P><STRONG><a name="[101]"></a>xiaobi_control</STRONG> (Thumb, 36 bytes, Stack size 8 bytes, actuator_control.o(.text.xiaobi_control))
 <BR><BR>[Stack]<UL><LI>Max Depth = 24<LI>Call Chain = xiaobi_control &rArr; dji_motor_set_location
 </UL>
 <BR>[Calls]<UL><LI><a href="#[11d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;dji_motor_set_location
@@ -2397,7 +2397,7 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[77]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Task0
 </UL>
 
-<P><STRONG><a name="[100]"></a>zhuzhou_control</STRONG> (Thumb, 72 bytes, Stack size 8 bytes, actuator_control.o(.text.zhuzhou_control))
+<P><STRONG><a name="[ff]"></a>zhuzhou_control</STRONG> (Thumb, 72 bytes, Stack size 8 bytes, actuator_control.o(.text.zhuzhou_control))
 <BR><BR>[Stack]<UL><LI>Max Depth = 24<LI>Call Chain = zhuzhou_control &rArr; dji_motor_set_location
 </UL>
 <BR>[Calls]<UL><LI><a href="#[11d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;dji_motor_set_location
@@ -2412,7 +2412,7 @@ Global Symbols
 
 <P><STRONG><a name="[174]"></a>__1printf</STRONG> (Thumb, 0 bytes, Stack size 24 bytes, printfa.o(i.__0printf), UNUSED)
 
-<P><STRONG><a name="[fd]"></a>__2printf</STRONG> (Thumb, 0 bytes, Stack size 24 bytes, printfa.o(i.__0printf))
+<P><STRONG><a name="[fe]"></a>__2printf</STRONG> (Thumb, 0 bytes, Stack size 24 bytes, printfa.o(i.__0printf))
 <BR><BR>[Stack]<UL><LI>Max Depth = 24<LI>Call Chain = __2printf
 </UL>
 <BR>[Called By]<UL><LI><a href="#[77]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Task0

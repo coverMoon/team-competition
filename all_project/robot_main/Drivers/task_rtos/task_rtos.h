@@ -44,7 +44,7 @@ typedef struct {
 
 // 任务一：箱子堆叠
 static const PolarCoord_t task1_boxes[3] = {{450.0f, 60.0f},  // (450mm, +60°) 
-                                            {350.0f, 45.0f}, // (350mm, +45°) 
+                                            {350.0f, 0.0f}, // (350mm, +45°) 
                                             {400.0f, -30.0f}}; // (400mm, -30°) 
 static const PolarCoord_t TASK1_TARGET_POS = {350.0f, -90.0f}; // (350mm, -90°) 
 

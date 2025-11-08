@@ -31,11 +31,11 @@ static const BoxZone_t TASK2_ZONES[] = {
     {{350.0f, 0.0f},155.0f, 1},      // 一区：径向350mm、角度0°，放置高度155mm
     {{350.0f, 45.0f}, 155.0f, 1},    // 一区：径向350mm、角度45°，放置高度155mm
     {{350.0f, -45.0f}, 155.0f, 1},   // 一区：径向350mm、角度-45°，放置高度155mm
-    {{600.0f, 30.0f}, 390.0f, 2},    // 二区：径向600mm、角度30°，放置高度390mm
-    {{600.0f, -30.0f}, 390.0f, 2},   // 二区：径向600mm、角度-30°，放置高度390mm
-    {{550.0f, 0.0f}, 260.0f, 3},     // 三区：径向550mm、角度0°，放置高度260mm
-    {{550.0f, 60.0f}, 260.0f, 3},    // 三区：径向550mm、角度60°，放置高度260mm
-    {{550.0f, -60.0f}, 260.0f, 3}    // 三区：径向550mm、角度-60°，放置高度260mm
+    {{425.0f, 30.0f}, 390.0f, 2},    // 二区：径向600mm、角度30°，放置高度390mm
+    {{425.0f, -30.0f}, 390.0f, 2},   // 二区：径向600mm、角度-30°，放置高度390mm
+    {{425.0f, 0.0f}, 260.0f, 3},     // 三区：径向550mm、角度0°，放置高度260mm
+    {{425.0f, 60.0f}, 260.0f, 3},    // 三区：径向550mm、角度60°，放置高度260mm
+    {{425.0f, -60.0f}, 260.0f, 3}    // 三区：径向550mm、角度-60°，放置高度260mm
 };
 
 
@@ -69,6 +69,7 @@ void Task0(void *argument)
     /* 无限循环：任务调度逻辑 */
     for (;;)
     {
+			move_to_position(test.height,test.radius,test.chassis_angle ,test.suction_angle);
         // 仅当无任务运行且sys指定有效任务时，启动新任务
         if (!is_task_running && sys != TASK_NONE)
         {
@@ -126,21 +127,24 @@ static void task1_rtos(void)
      */
  for (int i = 0; i < 3; i++) 
     {
+			// 3. 移动到目标位置安全高度
+			move_to_position((i + 1) * SMALL_BOX_HEIGHT + 20.0f,task1_boxes[i].radius,task1_boxes[i].angle, 0.0f);
 			// 1. 移动到抓取位置安全高度
 			move_to_position(SMALL_BOX_HEIGHT + 15.0f,task1_boxes[i].radius, task1_boxes[i].angle, 0.0f);
 			// 2. 下降到抓取高度并抓取
-			move_to_position(SMALL_BOX_HEIGHT,task1_boxes[i].radius, task1_boxes[i].angle, 0.0f);
+			move_to_position(SMALL_BOX_HEIGHT -13.0f,task1_boxes[i].radius, task1_boxes[i].angle, 0.0f);
 			pickup_box();
+			move_to_position(3* SMALL_BOX_HEIGHT + 20.0f ,task1_boxes[i].radius, task1_boxes[i].angle, 0.0f);
 			// 3. 移动到目标位置安全高度
-			move_to_position(i * SMALL_BOX_HEIGHT + 20.0f,TASK1_TARGET_POS.radius,TASK1_TARGET_POS.angle, 0.0f);
+			move_to_position((i + 1) * SMALL_BOX_HEIGHT + 20.0f,TASK1_TARGET_POS.radius,TASK1_TARGET_POS.angle, 0.0f);
 			// 4. 下降到放置高度并放置
-			move_to_position(i * SMALL_BOX_HEIGHT,TASK1_TARGET_POS.radius,TASK1_TARGET_POS.angle,0.0f);
+			move_to_position((i + 1) * SMALL_BOX_HEIGHT+10.0f,TASK1_TARGET_POS.radius,TASK1_TARGET_POS.angle,0.0f);
 			place_box();
     }
     printf("Task 1 logic not implemented.\r\n");
 }
 
-/**
+/**(i + 1) * SMALL_BOX_HEIGHT + 20.0f
  * @brief 任务二：定点放置
  * @details 从固定位置抓取4个小纸箱，放置到8个大纸箱中的任意4个
  */
@@ -186,22 +190,22 @@ static void task2_rtos(void)
 				{
             // 二区放置逻辑
 					  // 第一步：预定位（径向减150mm，防碰撞）
-            move_to_position(target_zone->height_offset ,target_zone->pos.radius - 150.0f,target_zone->pos.angle,75.0f);
+            move_to_position(target_zone->height_offset ,target_zone->pos.radius - 150.0f,target_zone->pos.angle,90.0f);
             // 第二步：精准定位到目标位置
-            move_to_position(target_zone->height_offset ,target_zone->pos.radius,target_zone->pos.angle,75.0f);
+            move_to_position(target_zone->height_offset ,target_zone->pos.radius,target_zone->pos.angle,90.0f);
             place_box();
             // 抬升安全高度
-            move_to_position(target_zone->height_offset  + 20.0f,target_zone->pos.radius,target_zone->pos.angle,75.0f);
+            move_to_position(target_zone->height_offset,target_zone->pos.radius - 150.0f ,target_zone->pos.angle,90.0f);
             printf("Placing in Zone 2\r\n");
         } 
 				else if (target_zone->type == 3) 
 				{
             // 三区放置逻辑
-					  move_to_position(target_zone->height_offset,target_zone->pos.radius - 180.0f,target_zone->pos.angle,90.0f);
-					  move_to_position(target_zone->height_offset,target_zone->pos.radius,target_zone->pos.angle,90.0f);
+					  move_to_position(target_zone->height_offset,target_zone->pos.radius - 180.0f,target_zone->pos.angle,75.0f);
+					  move_to_position(target_zone->height_offset,target_zone->pos.radius,target_zone->pos.angle,75.0f);
             place_box();
             // 放置后抬升20mm
-            move_to_position(target_zone->height_offset,target_zone->pos.radius - 180.0f,target_zone->pos.angle,90.0f);
+            move_to_position(target_zone->height_offset,target_zone->pos.radius - 180.0f,target_zone->pos.angle,75.0f);
             printf("Placing in Zone 3\r\n");
         }
     }
@@ -338,6 +342,7 @@ static void pickup_box()
 {
     // 吸盘抓取
 		xipan_control(1);
+	osDelay(3000);
 }
 
 /**
@@ -348,4 +353,5 @@ static void place_box()
 {
 		//吸盘放下
 		xipan_control(0);
+	osDelay(3000);
 }

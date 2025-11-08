@@ -59,6 +59,8 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
+#define Switch_Pin GPIO_PIN_7
+#define Switch_GPIO_Port GPIOA
 
 /* USER CODE BEGIN Private defines */
 // 防止重定义 M_PI

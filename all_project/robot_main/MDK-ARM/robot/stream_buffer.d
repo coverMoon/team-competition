@@ -1,9 +1,9 @@
 ./robot/stream_buffer.o: \
   ..\Middlewares\Third_Party\FreeRTOS\Source\stream_buffer.c \
-  F:\Keil\ARM\ARMCLANG\Bin\..\include\stdint.h \
-  F:\Keil\ARM\ARMCLANG\Bin\..\include\string.h \
+  D:\Tools\keil_v5\Arm\ARMCLANG\include\stdint.h \
+  D:\Tools\keil_v5\Arm\ARMCLANG\include\string.h \
   ..\Middlewares\Third_Party\FreeRTOS\Source\include\FreeRTOS.h \
-  F:\Keil\ARM\ARMCLANG\Bin\..\include\stddef.h \
+  D:\Tools\keil_v5\Arm\ARMCLANG\include\stddef.h \
   ..\Core\Inc\FreeRTOSConfig.h \
   ..\Middlewares\Third_Party\FreeRTOS\Source\include\projdefs.h \
   ..\Middlewares\Third_Party\FreeRTOS\Source\include\portable.h \

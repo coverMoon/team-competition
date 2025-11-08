@@ -129,11 +129,11 @@ void xipan_control(int open)
 {
     if(open == 1)
     {
-        HAL_GPIO_WritePin(GPIOA, GPIO_PIN_7, GPIO_PIN_SET);  // 引脚置高，吸盘吸合
+        HAL_GPIO_WritePin(Switch_GPIO_Port, Switch_Pin, GPIO_PIN_SET);  // 引脚置高，吸盘吸合
     }
     else
     {
-        HAL_GPIO_WritePin(GPIOA, GPIO_PIN_7, GPIO_PIN_RESET); // 引脚置低，吸盘释放
+        HAL_GPIO_WritePin(Switch_GPIO_Port, Switch_Pin, GPIO_PIN_RESET); // 引脚置低，吸盘释放
     }
 }
 

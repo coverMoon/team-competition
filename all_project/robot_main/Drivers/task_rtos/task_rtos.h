@@ -36,8 +36,9 @@ typedef struct {
 /* ------------------------- 比赛规则常量定义 ------------------------- */
 //限位
 #define MAX_HEIGHT 620.0f // 最大高度
-#define MIN_HEIGHT 140.0f // 最小高度
-
+#define MIN_HEIGHT 130.0f // 最小高度
+#define MAX_RADIUS 450.0f // 最大长度
+#define MIN_RADIUS 145.0f // 最小长度
 // 纸箱尺寸
 #define SMALL_BOX_HEIGHT 150.0f // 小纸箱高度 (mm) 
 #define BIG_BOX_HEIGHT   180.0f // 大纸箱高度 (mm) 
@@ -49,7 +50,7 @@ static const PolarCoord_t task1_boxes[3] = {{450.0f, 60.0f},  // (450mm, +60°)
 static const PolarCoord_t TASK1_TARGET_POS = {350.0f, -90.0f}; // (350mm, -90°) 
 
 // 任务二：定点放置
-static const PolarCoord_t TASK2_PICKUP_POS = {350.0f, 180.0f}; // 小纸箱叠放位置
+static const PolarCoord_t TASK2_PICKUP_POS = {350.0f, -180.0f}; // 小纸箱叠放位置
 
 //// 任务二 目标区域 (为简化，这里只列出坐标，高度和类型在 .c 文件中定义)
 //// 一区

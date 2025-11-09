@@ -60,7 +60,7 @@
 /* USER CODE BEGIN Variables */
 uint8_t rx_buffer[buf_size]; 
 volatile int16_t sys = TASK_NONE; 
-TestPosition_t test = { 620.0f, 155.0f, 0.0f, 0.0f, 0 };
+TestPosition_t test = { 620.0f, 145.0f, 0.0f, 0.0f, 0 };
 /* USER CODE END Variables */
 /* Definitions for Task */
 osThreadId_t TaskHandle;
@@ -194,7 +194,7 @@ void  HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t Size)
         else if (rx_buffer[0] == 'F')
         {
             // 将变量定义在最小作用域 (回调函数内部)
-            int parsed_numbers[6]; // 存储解析出的6个整数
+            int32_t parsed_numbers[6]; // 存储解析出的6个整数
             Task3Position_t local_positions[3]; // 存储转换后的3个坐标
 
             // 尝试解析字符串

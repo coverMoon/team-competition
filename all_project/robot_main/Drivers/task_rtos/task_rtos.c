@@ -31,11 +31,11 @@ static const BoxZone_t TASK2_ZONES[] = {
     {{350.0f, 0.0f},155.0f, 1},      // 一区：径向350mm、角度0°，放置高度155mm
     {{350.0f, 45.0f}, 155.0f, 1},    // 一区：径向350mm、角度45°，放置高度155mm
     {{350.0f, -45.0f}, 155.0f, 1},   // 一区：径向350mm、角度-45°，放置高度155mm
-    {{425.0f, 30.0f}, 390.0f, 2},    // 二区：径向600mm、角度30°，放置高度390mm
-    {{425.0f, -30.0f}, 390.0f, 2},   // 二区：径向600mm、角度-30°，放置高度390mm
-    {{425.0f, 0.0f}, 260.0f, 3},     // 三区：径向550mm、角度0°，放置高度260mm
-    {{425.0f, 60.0f}, 260.0f, 3},    // 三区：径向550mm、角度60°，放置高度260mm
-    {{425.0f, -60.0f}, 260.0f, 3}    // 三区：径向550mm、角度-60°，放置高度260mm
+    {{440.0f, 30.0f}, 330.0f, 2},    // 二区：径向600mm、角度30°，放置高度390mm
+    {{440.0f, -30.0f}, 330.0f, 2},   // 二区：径向600mm、角度-30°，放置高度390mm
+    {{310.0f, 0.0f}, 310.0f, 3},     // 三区：径向550mm、角度0°，放置高度260mm
+    {{310.0f, 60.0f}, 310.0f, 3},    // 三区：径向550mm、角度60°，放置高度260mm
+    {{310.0f, -60.0f}, 310.0f, 3}    // 三区：径向550mm、角度-60°，放置高度260mm
 };
 
 
@@ -69,6 +69,7 @@ void Task0(void *argument)
     /* 无限循环：任务调度逻辑 */
     for (;;)
     {
+			move_to_position(test.height,test.radius,test.chassis_angle,test.suction_angle);
 //			xipan_control(1);
         // 仅当无任务运行且sys指定有效任务时，启动新任务
         if (!is_task_running && sys != TASK_NONE)
@@ -133,9 +134,10 @@ static void task1_rtos(void)
 			// 1. 移动到抓取位置安全高度
 			move_to_position(SMALL_BOX_HEIGHT + 15.0f,task1_boxes[i].radius, task1_boxes[i].angle, 0.0f);
 			// 2. 下降到抓取高度并抓取
-			move_to_position(SMALL_BOX_HEIGHT-10.0f,task1_boxes[i].radius, task1_boxes[i].angle, 0.0f);
+			move_to_position(SMALL_BOX_HEIGHT-14.0f,task1_boxes[i].radius, task1_boxes[i].angle, 0.0f);
 			pickup_box();
 			// 3. 移动到目标位置安全高度
+			move_to_position(3 * SMALL_BOX_HEIGHT + 20.0f,TASK1_TARGET_POS.radius, TASK1_TARGET_POS.angle, 0.0f);
 			move_to_position(times * SMALL_BOX_HEIGHT + 20.0f,TASK1_TARGET_POS.radius,TASK1_TARGET_POS.angle, 0.0f);
 			// 4. 下降到放置高度并放置
 			move_to_position(times * SMALL_BOX_HEIGHT+ 5.0f,TASK1_TARGET_POS.radius,TASK1_TARGET_POS.angle,0.0f);
@@ -151,22 +153,36 @@ static void task1_rtos(void)
 static void task2_rtos(void)
 {
     // 策略：选择要放置的4个目标区域的索引 (0-7)
-    int chosen_target[4] = {3,4,5,6};
+    int chosen_target[4] = {4,5,6,7};
 
     for (int i = 0; i < 4; i++)
     {
         // 1. 计算抓取高度
         // 抓取第 i 个箱子 (从0开始)，每个高 SMALL_BOX_HEIGHT
         // 注意：从上往下抓取 (第0个在最上)
-        float pickup_height = (4 - i) * SMALL_BOX_HEIGHT + 15.0f;		// 留够余量
+        float pickup_height = (4 - i) * SMALL_BOX_HEIGHT;	// 留够余量
+		 	static float pickup_radius;
+			if(chosen_target[i] == 4)
+			{
+				pickup_radius = TASK2_PICKUP_POS.radius + 30.0f;
+			}
+			else 
+			{
+				pickup_radius = TASK2_PICKUP_POS.radius;
+			}
+			if(i==3)
+			{
+				pickup_height-=20.0f;
+			}
 			  // 1. 移动到抓取位置上方安全高度（随层数递增）
-        move_to_position(pickup_height,TASK2_PICKUP_POS.radius,TASK2_PICKUP_POS.angle,0.0f);
+        move_to_position(4 * SMALL_BOX_HEIGHT + 20.0f,pickup_radius,TASK2_PICKUP_POS.angle,0.0f);
         // 2. 下降到抓取高度，吸起箱子
-        move_to_position((4 - i) * SMALL_BOX_HEIGHT,TASK2_PICKUP_POS.radius,TASK2_PICKUP_POS.angle,0.0f);
+        move_to_position(pickup_height - 20.0f,pickup_radius,TASK2_PICKUP_POS.angle,0.0f);
         pickup_box();
         // 3. 抬升20mm，防碰撞
-        move_to_position(pickup_height, TASK2_PICKUP_POS.radius,TASK2_PICKUP_POS.angle,0.0f);
-        // 3. 获取目标位置信息
+        move_to_position( 4 * SMALL_BOX_HEIGHT, pickup_radius,TASK2_PICKUP_POS.angle,0.0f);
+			
+				// 3. 获取目标位置信息
         int target_index = chosen_target[i];
         const BoxZone_t* target_zone = &TASK2_ZONES[target_index];
 
@@ -190,22 +206,25 @@ static void task2_rtos(void)
 				{
             // 二区放置逻辑
 					  // 第一步：预定位（径向减150mm，防碰撞）
-            move_to_position(target_zone->height_offset ,target_zone->pos.radius - 150.0f,target_zone->pos.angle,90.0f);
+					move_to_position( 4 * SMALL_BOX_HEIGHT, pickup_radius,target_zone->pos.angle,0.0f);
+					move_to_position(4 * SMALL_BOX_HEIGHT, target_zone->pos.radius - 180.0f,target_zone->pos.angle,90.0f);
+            move_to_position(target_zone->height_offset ,target_zone->pos.radius - 180.0f,target_zone->pos.angle,90.0f);
             // 第二步：精准定位到目标位置
             move_to_position(target_zone->height_offset ,target_zone->pos.radius,target_zone->pos.angle,90.0f);
             place_box();
-            // 抬升安全高度
+            // 撤出吸盘
             move_to_position(target_zone->height_offset,target_zone->pos.radius - 75.0f,target_zone->pos.angle,90.0f);
             printf("Placing in Zone 2\r\n");
         } 
 				else if (target_zone->type == 3) 
 				{
             // 三区放置逻辑
-					  move_to_position(target_zone->height_offset-180.0f,target_zone->pos.radius,target_zone->pos.angle,75.0f);
-					  move_to_position(target_zone->height_offset,target_zone->pos.radius,target_zone->pos.angle,75.0f);
+					//1.
+					  move_to_position(4 * SMALL_BOX_HEIGHT, pickup_radius,target_zone->pos.angle,0.0f);
+					  move_to_position(target_zone->height_offset + 180.0f,target_zone->pos.radius,target_zone->pos.angle,70.0f);
+					  move_to_position(target_zone->height_offset,target_zone->pos.radius,target_zone->pos.angle,70.0f);
             place_box();
-            // 放置后抬升20mm
-            move_to_position(target_zone->height_offset,target_zone->pos.radius - 180.0f,target_zone->pos.angle,75.0f);
+            move_to_position(target_zone->height_offset + 20.0f,target_zone->pos.radius,target_zone->pos.angle,70.0f);
             printf("Placing in Zone 3\r\n");
         }
     }
@@ -246,8 +265,8 @@ static void task3_rtos(void)
     // 抓取位置同任务二
     for (int i = 0; i < 3; i++)
     {
-        // 1. 计算抓取高度 (从上往下抓)
-        float pickup_height = (3 - i) * SMALL_BOX_HEIGHT + 15.0f;
+        // 1. 计算抓取高度 (从上往下抓)F350A0S400A60L450A-45
+        float pickup_height = (3 - i) * SMALL_BOX_HEIGHT;
    			// 2. 抓取
         /* * --- 运动学代码 (抓取) ---
          * * 1. 移动到 TASK2_PICKUP_POS (pickup_height + 安全裕量)
@@ -266,14 +285,15 @@ static void task3_rtos(void)
          * 5. 回到安全位置
          */
 			// 1. 移动到抓取位置上方安全高度
-        move_to_position( pickup_height + 20.0f,TASK2_PICKUP_POS.radius,TASK2_PICKUP_POS.angle,0.0f);
+        move_to_position( 3 * SMALL_BOX_HEIGHT+ 20.0f,TASK2_PICKUP_POS.radius,TASK2_PICKUP_POS.angle,0.0f);
         
         // 2. 下降到抓取高度，吸起箱子
-        move_to_position(pickup_height,TASK2_PICKUP_POS.radius,TASK2_PICKUP_POS.angle,0.0f);
+        move_to_position(pickup_height - 20.0f,TASK2_PICKUP_POS.radius,TASK2_PICKUP_POS.angle,0.0f);
         pickup_box();
         
         // 3. 移动到随机位置的补偿位
-        move_to_position( pickup_height ,random_positions[i].radius,random_positions[i].angle,0.0f);
+				move_to_position( 3 * SMALL_BOX_HEIGHT + 20.0f,TASK2_PICKUP_POS.radius,TASK2_PICKUP_POS.angle,0.0f);
+        move_to_position( 3 * SMALL_BOX_HEIGHT + 20.0f,random_positions[i].radius,random_positions[i].angle,0.0f);
         
         // 4. 下降到放置高度，松开箱子
         move_to_position(SMALL_BOX_HEIGHT + 5.0f,random_positions[i].radius,random_positions[i].angle,0.0f);
@@ -312,22 +332,47 @@ void send_task3_positions(Task3Position_t positions[], uint8_t count)
  */
 static void move_to_position(float height, float radius, float chassis_angle,float suction_angle)
 {
-    // 控制小臂旋转（2006电机）
-	zhuzhou_control(height);
-		osDelay(1);
-	while (!all_motors_in_position()) 
+	if(height <= MAX_HEIGHT && height >= MIN_HEIGHT)
+	{
+		height = height;
+	}
+			else if(height > MAX_HEIGHT)
 		{
-				osDelay(10);
-		}		
+			height = MAX_HEIGHT;
+		}
+		else if( height < MIN_HEIGHT)
+		{
+			height= MIN_HEIGHT;
+		}
+		// 控制主轴高度（3508电机1）
+		zhuzhou_control(height);
+		osDelay(1);
+//	while (!all_motors_in_position()) 
+//		{
+//				osDelay(10);
+//		}		
+    // 控制小臂旋转（2006电机）
     xiaobi_control(suction_angle);
 		osDelay(1);
-		// 控制主轴高度（3508电机1）
     
 	  // 控制底盘旋转到目标角度（小米电机）
     chassis_control(chassis_angle);
 		osDelay(1);
     // 控制径向距离（3508电机2）
+		if(radius <= MAX_RADIUS && radius >= MIN_RADIUS)
+		{
+			radius=radius;
+		}
+		else if(radius > MAX_RADIUS)
+		{
+			radius = MAX_RADIUS;
+		}
+		else if( radius < MIN_RADIUS)
+		{
+			radius= MIN_RADIUS;
+		}
     dabi_control(radius);
+		
 		while (!all_motors_in_position()) 
 		{
 				osDelay(10);

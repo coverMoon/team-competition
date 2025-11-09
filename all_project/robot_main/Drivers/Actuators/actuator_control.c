@@ -111,7 +111,7 @@ void xiaobi_control(float angle)
  */
 void dabi_control(float length)
 {
-		float target = -((length - 155.0f) / 76.5f * 360.0f * 19.0f);
+		float target = -((length - 145.0f) / 76.4f * 360.0f * 19.0f);
     int32_t angle = dji_degree2encoder(target);  // 长度→编码器角度换算（待调试确认）
     dji_motor_set_location(dji_motor_dabi, angle);  // 发送目标位置指令
 }

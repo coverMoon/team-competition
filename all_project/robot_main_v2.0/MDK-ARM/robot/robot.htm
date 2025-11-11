@@ -3,7 +3,7 @@
 <title>Static Call Graph - [.\robot\robot.axf]</title></head>
 <body><HR>
 <H1>Static Call Graph for image .\robot\robot.axf</H1><HR>
-<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 6210000: Last Updated: Tue Nov 11 16:08:00 2025
+<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 6210000: Last Updated: Tue Nov 11 22:40:59 2025
 <BR><P>
 <H3>Maximum Stack Usage =        456 bytes + Unknown(Cycles, Untraceable Function Pointers)</H3><H3>
 Call chain for Maximum Stack Depth:</H3>
@@ -1606,7 +1606,7 @@ Global Symbols
 </UL>
 
 <P><STRONG><a name="[77]"></a>Task0</STRONG> (Thumb, 246 bytes, Stack size 24 bytes, task_rtos.o(.text.Task0))
-<BR><BR>[Stack]<UL><LI>Max Depth = 364<LI>Call Chain = Task0 &rArr; task3_rtos &rArr; move_to_position &rArr; chassis_control &rArr; trajectory_planner_set_target &rArr; xQueueGenericSend &rArr; prvCopyDataToQueue &rArr; xTaskPriorityDisinherit &rArr; vListInsertEnd
+<BR><BR>[Stack]<UL><LI>Max Depth = 412<LI>Call Chain = Task0 &rArr; task3_rtos &rArr; move_to_position &rArr; chassis_control &rArr; trajectory_planner_set_target &rArr; xQueueGenericSend &rArr; prvCopyDataToQueue &rArr; xTaskPriorityDisinherit &rArr; vListInsertEnd
 </UL>
 <BR>[Calls]<UL><LI><a href="#[120]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;osDelay
 <LI><a href="#[11c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;printf
@@ -1912,6 +1912,7 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[77]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Task0
 <LI><a href="#[163]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;place_box
 <LI><a href="#[161]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;pickup_box
+<LI><a href="#[11e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;task2_rtos
 <LI><a href="#[11b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;move_to_position
 </UL>
 
@@ -3242,7 +3243,7 @@ Local Symbols
 <LI><a href="#[11d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;task1_rtos
 </UL>
 
-<P><STRONG><a name="[11d]"></a>task1_rtos</STRONG> (Thumb, 332 bytes, Stack size 40 bytes, task_rtos.o(.text.task1_rtos))
+<P><STRONG><a name="[11d]"></a>task1_rtos</STRONG> (Thumb, 372 bytes, Stack size 40 bytes, task_rtos.o(.text.task1_rtos))
 <BR><BR>[Stack]<UL><LI>Max Depth = 260<LI>Call Chain = task1_rtos &rArr; move_to_position &rArr; chassis_control &rArr; trajectory_planner_set_target &rArr; xQueueGenericSend &rArr; prvCopyDataToQueue &rArr; xTaskPriorityDisinherit &rArr; vListInsertEnd
 </UL>
 <BR>[Calls]<UL><LI><a href="#[11c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;printf
@@ -3253,10 +3254,11 @@ Local Symbols
 <BR>[Called By]<UL><LI><a href="#[77]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Task0
 </UL>
 
-<P><STRONG><a name="[11e]"></a>task2_rtos</STRONG> (Thumb, 712 bytes, Stack size 80 bytes, task_rtos.o(.text.task2_rtos))
+<P><STRONG><a name="[11e]"></a>task2_rtos</STRONG> (Thumb, 736 bytes, Stack size 80 bytes, task_rtos.o(.text.task2_rtos))
 <BR><BR>[Stack]<UL><LI>Max Depth = 300<LI>Call Chain = task2_rtos &rArr; move_to_position &rArr; chassis_control &rArr; trajectory_planner_set_target &rArr; xQueueGenericSend &rArr; prvCopyDataToQueue &rArr; xTaskPriorityDisinherit &rArr; vListInsertEnd
 </UL>
-<BR>[Calls]<UL><LI><a href="#[11c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;printf
+<BR>[Calls]<UL><LI><a href="#[120]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;osDelay
+<LI><a href="#[11c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;printf
 <LI><a href="#[163]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;place_box
 <LI><a href="#[161]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;pickup_box
 <LI><a href="#[11b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;move_to_position
@@ -3264,8 +3266,8 @@ Local Symbols
 <BR>[Called By]<UL><LI><a href="#[77]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Task0
 </UL>
 
-<P><STRONG><a name="[11f]"></a>task3_rtos</STRONG> (Thumb, 472 bytes, Stack size 120 bytes, task_rtos.o(.text.task3_rtos))
-<BR><BR>[Stack]<UL><LI>Max Depth = 340<LI>Call Chain = task3_rtos &rArr; move_to_position &rArr; chassis_control &rArr; trajectory_planner_set_target &rArr; xQueueGenericSend &rArr; prvCopyDataToQueue &rArr; xTaskPriorityDisinherit &rArr; vListInsertEnd
+<P><STRONG><a name="[11f]"></a>task3_rtos</STRONG> (Thumb, 864 bytes, Stack size 168 bytes, task_rtos.o(.text.task3_rtos))
+<BR><BR>[Stack]<UL><LI>Max Depth = 388<LI>Call Chain = task3_rtos &rArr; move_to_position &rArr; chassis_control &rArr; trajectory_planner_set_target &rArr; xQueueGenericSend &rArr; prvCopyDataToQueue &rArr; xTaskPriorityDisinherit &rArr; vListInsertEnd
 </UL>
 <BR>[Calls]<UL><LI><a href="#[138]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_f2d
 <LI><a href="#[11c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;printf

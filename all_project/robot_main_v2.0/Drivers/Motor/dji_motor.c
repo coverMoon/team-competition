@@ -125,11 +125,11 @@ void dji_motors_init(void)
     dji_motor_configure(1, CAN_3508_2006_M2_ID, &hfdcan1, 
 												0.15f, 0.001f, 0.035f, 
 												24.0f, 1.2f, 0.03f, 
-												900, -900, 12000, -12000);
+												1000, -1000, 12000, -12000);
     dji_motor_configure(2, CAN_3508_2006_M3_ID, &hfdcan1, 
 												0.15f, 0.001f, 0.035f, 
 												24.0f, 1.2f, 0.03f, 
-												900, -900, 12000, -12000);
+												1000, -1000, 12000, -12000);
 //    dji_motor_configure(3, CAN_3508_2006_M4_ID, &hfdcan1, 
 //												0.15f, 0.001f, 0.035f, 
 //												24.0f, 1.2f, 0.03f, 

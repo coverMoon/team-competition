@@ -17,12 +17,12 @@
   ..\Drivers\CMSIS\Device\ST\STM32G4xx\Include\stm32g4xx.h \
   ..\Drivers\CMSIS\Device\ST\STM32G4xx\Include\stm32g474xx.h \
   ..\Drivers\CMSIS\Include\core_cm4.h \
-  E:\project\RoboCon\team-competition\all_project\robot_main\Drivers\CMSIS\Include\cmsis_version.h \
-  E:\project\RoboCon\team-competition\all_project\robot_main\Drivers\CMSIS\Include\cmsis_compiler.h \
-  E:\project\RoboCon\team-competition\all_project\robot_main\Drivers\CMSIS\Include\cmsis_armclang.h \
+  E:\project\RoboCon\team-competition\all_project\robot_main_v2.0\Drivers\CMSIS\Include\cmsis_version.h \
+  E:\project\RoboCon\team-competition\all_project\robot_main_v2.0\Drivers\CMSIS\Include\cmsis_compiler.h \
+  E:\project\RoboCon\team-competition\all_project\robot_main_v2.0\Drivers\CMSIS\Include\cmsis_armclang.h \
   D:\Tools\keil_v5\Arm\ARMCLANG\include\arm_compat.h \
   D:\Tools\keil_v5\Arm\ARMCLANG\include\arm_acle.h \
-  E:\project\RoboCon\team-competition\all_project\robot_main\Drivers\CMSIS\Include\mpu_armv7.h \
+  E:\project\RoboCon\team-competition\all_project\robot_main_v2.0\Drivers\CMSIS\Include\mpu_armv7.h \
   ..\Drivers\CMSIS\Device\ST\STM32G4xx\Include\system_stm32g4xx.h \
   ..\Drivers\STM32G4xx_HAL_Driver\Inc\Legacy\stm32_hal_legacy.h \
   ..\Drivers\STM32G4xx_HAL_Driver\Inc\stm32g4xx_hal_rcc_ex.h \

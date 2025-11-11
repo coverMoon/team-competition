@@ -245,8 +245,22 @@ void  HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t Size)
 				}
         
         // 3. 重新启动 UART DMA 接收，准备接收下一条指令
-        HAL_UARTEx_ReceiveToIdle_DMA(&huart5, rx_buffer, buf_size);
+        HAL_UARTEx_ReceiveToIdle_DMA(huart, rx_buffer, buf_size);
     }
+}
+
+/**
+  * @brief  UART error callback.
+  * @param  huart UART handle.
+  * @retval None
+  */
+void HAL_UART_ErrorCallback(UART_HandleTypeDef *huart)
+{
+  // 清除所有错误标志位
+	__HAL_UART_CLEAR_FLAG(huart, UART_FLAG_ORE | UART_FLAG_NE | UART_FLAG_FE | UART_FLAG_PE);
+	
+	// 重启串口
+	HAL_UARTEx_ReceiveToIdle_DMA(huart, rx_buffer, buf_size);
 }
 /* USER CODE END Application */
 

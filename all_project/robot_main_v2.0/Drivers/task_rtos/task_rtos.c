@@ -69,7 +69,7 @@ void Task0(void *argument)
     /* 无限循环：任务调度逻辑 */
     for (;;)
     {
-			move_to_position(test.height,test.radius,test.chassis_angle,test.suction_angle);
+				move_to_position(test.height,test.radius,test.chassis_angle,test.suction_angle);
 //			xipan_control(1);
         // 仅当无任务运行且sys指定有效任务时，启动新任务
         if (!is_task_running && sys != TASK_NONE)
@@ -134,14 +134,14 @@ static void task1_rtos(void)
 			// 1. 移动到抓取位置安全高度
 			move_to_position(SMALL_BOX_HEIGHT + 15.0f,task1_boxes[i].radius, task1_boxes[i].angle, 0.0f);
 			// 2. 下降到抓取高度并抓取
-			move_to_position(SMALL_BOX_HEIGHT-14.0f,task1_boxes[i].radius, task1_boxes[i].angle, 0.0f);
+			move_to_position(SMALL_BOX_HEIGHT - 20.0f,task1_boxes[i].radius, task1_boxes[i].angle, 0.0f);
 			pickup_box();
 			move_to_position(3 * SMALL_BOX_HEIGHT + 20.0f,task1_boxes[i].radius, task1_boxes[i].angle, 0.0f);
 			// 3. 移动到目标位置安全高度
 			move_to_position(3 * SMALL_BOX_HEIGHT + 20.0f,TASK1_TARGET_POS.radius, TASK1_TARGET_POS.angle, 0.0f);
 			move_to_position(times * SMALL_BOX_HEIGHT + 20.0f,TASK1_TARGET_POS.radius,TASK1_TARGET_POS.angle, 0.0f);
 			// 4. 下降到放置高度并放置
-			move_to_position(times * SMALL_BOX_HEIGHT+ 5.0f,TASK1_TARGET_POS.radius,TASK1_TARGET_POS.angle,0.0f);
+			move_to_position(times * SMALL_BOX_HEIGHT - 5.0f,TASK1_TARGET_POS.radius,TASK1_TARGET_POS.angle,0.0f);
 			place_box();
     }
     printf("Task 1 logic not implemented.\r\n");
@@ -207,14 +207,14 @@ static void task2_rtos(void)
 				{
             // 二区放置逻辑
 					  // 第一步：预定位（径向减150mm，防碰撞）
-					move_to_position( 4 * SMALL_BOX_HEIGHT, pickup_radius,target_zone->pos.angle,0.0f);
-					move_to_position(4 * SMALL_BOX_HEIGHT, target_zone->pos.radius - 180.0f,target_zone->pos.angle,90.0f);
-            move_to_position(target_zone->height_offset ,target_zone->pos.radius - 180.0f,target_zone->pos.angle,90.0f);
+						move_to_position( 4 * SMALL_BOX_HEIGHT, pickup_radius,target_zone->pos.angle,0.0f);
+						move_to_position(4 * SMALL_BOX_HEIGHT, target_zone->pos.radius - 180.0f,target_zone->pos.angle,90.0f);
+            move_to_position(target_zone->height_offset - 10.0f, target_zone->pos.radius - 180.0f,target_zone->pos.angle,90.0f);
             // 第二步：精准定位到目标位置
-            move_to_position(target_zone->height_offset ,target_zone->pos.radius,target_zone->pos.angle,90.0f);
+            move_to_position(target_zone->height_offset - 10.0f, target_zone->pos.radius,target_zone->pos.angle,90.0f);
             place_box();
             // 撤出吸盘
-            move_to_position(target_zone->height_offset,target_zone->pos.radius - 75.0f,target_zone->pos.angle,90.0f);
+            move_to_position(target_zone->height_offset - 10.0f, target_zone->pos.radius - 75.0f,target_zone->pos.angle,90.0f);
             printf("Placing in Zone 2\r\n");
         } 
 				else if (target_zone->type == 3) 
@@ -222,10 +222,10 @@ static void task2_rtos(void)
             // 三区放置逻辑
 					//1.
 					  move_to_position(4 * SMALL_BOX_HEIGHT, pickup_radius,target_zone->pos.angle,0.0f);
-					  move_to_position(target_zone->height_offset + 180.0f,target_zone->pos.radius,target_zone->pos.angle,70.0f);
-					  move_to_position(target_zone->height_offset,target_zone->pos.radius,target_zone->pos.angle,70.0f);
+					  move_to_position(target_zone->height_offset + 180.0f,target_zone->pos.radius - 10.0f,target_zone->pos.angle,70.0f);
+					  move_to_position(target_zone->height_offset,target_zone->pos.radius - 10.0f,target_zone->pos.angle,70.0f);
             place_box();
-            move_to_position(target_zone->height_offset + 20.0f,target_zone->pos.radius,target_zone->pos.angle,70.0f);
+            move_to_position(target_zone->height_offset + 20.0f,target_zone->pos.radius - 10.0f, target_zone->pos.angle,70.0f);
             printf("Placing in Zone 3\r\n");
         }
     }
@@ -300,10 +300,10 @@ static void task3_rtos(void)
         move_to_position(SMALL_BOX_HEIGHT + 5.0f,random_positions[i].radius,random_positions[i].angle,0.0f);
         place_box();
          
-         printf("Placing at random pos %d (R=%.1f, A=%.1f)\r\n", 
-								i, 
-                random_positions[i].radius, 
-                random_positions[i].angle);
+        printf("Placing at random pos %d (R=%.1f, A=%.1f)\r\n", 
+							i, 
+              random_positions[i].radius, 
+              random_positions[i].angle);
     }
 }
 
@@ -333,11 +333,11 @@ void send_task3_positions(Task3Position_t positions[], uint8_t count)
  */
 static void move_to_position(float height, float radius, float chassis_angle,float suction_angle)
 {
-	if(height <= MAX_HEIGHT && height >= MIN_HEIGHT)
-	{
-		height = height;
-	}
-			else if(height > MAX_HEIGHT)
+		if(height <= MAX_HEIGHT && height >= MIN_HEIGHT)
+		{
+			height = height;
+		}
+		else if(height > MAX_HEIGHT)
 		{
 			height = MAX_HEIGHT;
 		}
@@ -354,11 +354,11 @@ static void move_to_position(float height, float radius, float chassis_angle,flo
 //		}		
 		
     // 控制小臂旋转（2006电机）
-			if(suction_angle <= MAX_ANGLE && suction_angle >= MIN_ANGLE)
-	{
-		suction_angle = suction_angle;
-	}
-			else if(suction_angle > MAX_ANGLE)
+		if(suction_angle <= MAX_ANGLE && suction_angle >= MIN_ANGLE)
+		{
+			suction_angle = suction_angle;
+		}
+		else if(suction_angle > MAX_ANGLE)
 		{
 			suction_angle = MAX_ANGLE;
 		}
@@ -403,7 +403,7 @@ static void pickup_box()
 {
     // 吸盘抓取
 		xipan_control(1);
-	osDelay(3000);
+		osDelay(3000);
 }
 
 /**
@@ -414,5 +414,5 @@ static void place_box()
 {
 		//吸盘放下
 		xipan_control(0);
-	osDelay(3000);
+		osDelay(5000);
 }

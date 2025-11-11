@@ -102,6 +102,7 @@ int main(void)
   MX_FDCAN3_Init();
   MX_TIM6_Init();
   MX_UART5_Init();
+  MX_UART4_Init();
   /* USER CODE BEGIN 2 */
 	
   /* USER CODE END 2 */
@@ -217,8 +218,11 @@ void Error_Handler(void)
   /* USER CODE BEGIN Error_Handler_Debug */
   /* User can add his own implementation to report the HAL error return state */
   __disable_irq();
+	
+	
   while (1)
   {
+		
   }
   /* USER CODE END Error_Handler_Debug */
 }

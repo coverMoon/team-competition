@@ -48,7 +48,8 @@
 #define TASK_1 				1   
 #define TASK_2 				2   
 #define TASK_3 				3 
-
+Task3Position_t random_positions[3];
+int flag = 0;
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -195,7 +196,7 @@ void  HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t Size)
         {
             // 将变量定义在最小作用域 (回调函数内部)
             int32_t parsed_numbers[6]; // 存储解析出的6个整数
-            Task3Position_t local_positions[3]; // 存储转换后的3个坐标
+//            Task3Position_t local_positions[3]; // 存储转换后的3个坐标
 
             // 尝试解析字符串
             // 格式: F(radius1)A(angle1)S(radius2)A(angle2)L(radius3)A(angle3)
@@ -208,15 +209,15 @@ void  HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t Size)
             if (parse_count == 6)
             {
                 // 将解析的整数转换为浮点数并填充结构体
-                local_positions[0].radius = (float)parsed_numbers[0];
-                local_positions[0].angle  = (float)parsed_numbers[1];
-                local_positions[1].radius = (float)parsed_numbers[2];
-                local_positions[1].angle  = (float)parsed_numbers[3];
-                local_positions[2].radius = (float)parsed_numbers[4];
-                local_positions[2].angle  = (float)parsed_numbers[5];
-
+                random_positions[0].radius = (float)parsed_numbers[0];
+                random_positions[0].angle  = (float)parsed_numbers[1];
+                random_positions[1].radius = (float)parsed_numbers[2];
+                random_positions[1].angle  = (float)parsed_numbers[3];
+                random_positions[2].radius = (float)parsed_numbers[4];
+                random_positions[2].angle  = (float)parsed_numbers[5];
+				flag = 1;
                 // 将解析到的坐标发送到消息队列 (在中断中，使用 0 超时)
-                send_task3_positions(local_positions, 3);
+//                send_task3_positions(local_positions, 3);
             }
             else
             {

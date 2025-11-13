@@ -65,7 +65,7 @@ void Task0(void *argument)
     // 初始化硬件抽象层
     chassis_init(); // 初始化底盘电机 (小米电机)
     dji_init();     // 初始化DJI电机 (3508*2, 2006*1)
-
+    extern int flag;
     /* 无限循环：任务调度逻辑 */
     for (;;)
     {
@@ -96,6 +96,7 @@ void Task0(void *argument)
             // 任务执行完成，重置状态
             printf("Task %d Finished\r\n", sys);
             is_task_running = false;
+			flag = 0;
             sys = TASK_NONE; // 复位sys，等待下一次任务指令
         }
 
@@ -242,29 +243,33 @@ static void task2_rtos(void)
  */
 static void task3_rtos(void)
 {
-    Task3Position_t random_positions[3];
-    uint8_t received_count = 0;
-    osStatus_t status;
+    extern Task3Position_t random_positions[3];
+	extern int flag;
+//    uint8_t received_count = 0;
+//    osStatus_t status;
 
     printf("Task 3: Waiting for 3 positions...\r\n");
 
     // 1. 阻塞式接收 3 个随机坐标
     //    使用 osWaitForever 确保任务在收到所有数据前不会执行
-    while (received_count < 3)
-    {
-        // 从队列中获取一个 Task3Position_t (大小为 8 字节)
-        status = osMessageQueueGet(task3positionHandle, &random_positions[received_count], NULL, osWaitForever);
-        
-        if (status == osOK)
-        {
-            received_count++;
-            printf("Received position %d: R=%.1f, A=%.1f\r\n",
-                   received_count,
-                   random_positions[received_count - 1].radius,
-                   random_positions[received_count - 1].angle);
-        }
-    }
-    
+//    while (received_count < 3)
+//    {
+//        // 从队列中获取一个 Task3Position_t (大小为 8 字节)
+//        status = osMessageQueueGet(task3positionHandle, &random_positions[received_count], NULL, osWaitForever);
+//        
+//        if (status == osOK)
+//        {
+//            received_count++;
+//            printf("Received position %d: R=%.1f, A=%.1f\r\n",
+//                   received_count,
+//                   random_positions[received_count - 1].radius,
+//                   random_positions[received_count - 1].angle);
+//        }
+//    }
+    while (flag == 0) 
+		{
+				osDelay(10);
+		}	
     printf("All 3 positions received. Starting movement.\r\n");
 
     // 2. 抓取并放置

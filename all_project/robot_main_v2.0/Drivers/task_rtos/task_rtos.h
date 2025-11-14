@@ -46,10 +46,10 @@ typedef struct {
 #define BIG_BOX_HEIGHT   180.0f // 大纸箱高度 (mm) 
 
 // 任务一：箱子堆叠
-static const PolarCoord_t task1_boxes[3] = {{450.0f, 60.0f},  // (450mm, +60°) 
-                                            {350.0f, 45.0f}, // (350mm, +45°) 
-                                            {400.0f, -30.0f}}; // (400mm, -30°) 
-static const PolarCoord_t TASK1_TARGET_POS = {350.0f, -90.0f}; // (350mm, -90°) 
+static const PolarCoord_t task1_boxes[3] = {{450.0f, -60.0f},  // (450mm, +60°) 
+                                            {350.0f, -45.0f}, // (350mm, +45°) 
+                                            {400.0f, 30.0f}}; // (400mm, -30°) 
+static const PolarCoord_t TASK1_TARGET_POS = {350.0f, 90.0f}; // (350mm, -90°) 
 
 // 任务二：定点放置
 static const PolarCoord_t TASK2_PICKUP_POS = {350.0f, -180.0f}; // 小纸箱叠放位置

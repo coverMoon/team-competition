@@ -3,7 +3,7 @@
 <title>Static Call Graph - [.\robot\robot.axf]</title></head>
 <body><HR>
 <H1>Static Call Graph for image .\robot\robot.axf</H1><HR>
-<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 6190004: Last Updated: Wed Nov 12 22:25:44 2025
+<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 6190004: Last Updated: Fri Nov 14 21:06:49 2025
 <BR><P>
 <H3>Maximum Stack Usage =        432 bytes + Unknown(Cycles, Untraceable Function Pointers)</H3><H3>
 Call chain for Maximum Stack Depth:</H3>
@@ -1299,7 +1299,7 @@ Global Symbols
 <LI><a href="#[101]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;MX_FREERTOS_Init
 </UL>
 
-<P><STRONG><a name="[ec]"></a>HAL_UARTEx_RxEventCallback</STRONG> (Thumb, 462 bytes, Stack size 88 bytes, app_freertos.o(.text.HAL_UARTEx_RxEventCallback))
+<P><STRONG><a name="[ec]"></a>HAL_UARTEx_RxEventCallback</STRONG> (Thumb, 474 bytes, Stack size 88 bytes, app_freertos.o(.text.HAL_UARTEx_RxEventCallback))
 <BR><BR>[Stack]<UL><LI>Max Depth = 352<LI>Call Chain = HAL_UARTEx_RxEventCallback &rArr; sscanf &rArr; __vfscanf_char &rArr; __vfscanf &rArr; _scanf_real
 </UL>
 <BR>[Calls]<UL><LI><a href="#[ea]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_UARTEx_ReceiveToIdle_DMA
@@ -3218,7 +3218,7 @@ Local Symbols
 <BR>[Called By]<UL><LI><a href="#[77]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Task0
 </UL>
 
-<P><STRONG><a name="[11d]"></a>task2_rtos</STRONG> (Thumb, 768 bytes, Stack size 80 bytes, task_rtos.o(.text.task2_rtos))
+<P><STRONG><a name="[11d]"></a>task2_rtos</STRONG> (Thumb, 820 bytes, Stack size 80 bytes, task_rtos.o(.text.task2_rtos))
 <BR><BR>[Stack]<UL><LI>Max Depth = 300<LI>Call Chain = task2_rtos &rArr; move_to_position &rArr; chassis_control &rArr; trajectory_planner_set_target &rArr; xQueueGenericSend &rArr; prvCopyDataToQueue &rArr; xTaskPriorityDisinherit &rArr; vListInsertEnd
 </UL>
 <BR>[Calls]<UL><LI><a href="#[11f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;osDelay

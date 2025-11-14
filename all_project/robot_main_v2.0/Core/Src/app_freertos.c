@@ -210,11 +210,11 @@ void  HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t Size)
             {
                 // 将解析的整数转换为浮点数并填充结构体
                 random_positions[0].radius = (float)parsed_numbers[0];
-                random_positions[0].angle  = (float)parsed_numbers[1];
+                random_positions[0].angle  = -(float)parsed_numbers[1];
                 random_positions[1].radius = (float)parsed_numbers[2];
-                random_positions[1].angle  = (float)parsed_numbers[3];
+                random_positions[1].angle  = -(float)parsed_numbers[3];
                 random_positions[2].radius = (float)parsed_numbers[4];
-                random_positions[2].angle  = (float)parsed_numbers[5];
+                random_positions[2].angle  = -(float)parsed_numbers[5];
 				flag = 1;
                 // 将解析到的坐标发送到消息队列 (在中断中，使用 0 超时)
 //                send_task3_positions(local_positions, 3);

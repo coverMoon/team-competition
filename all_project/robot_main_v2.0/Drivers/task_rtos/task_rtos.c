@@ -135,7 +135,9 @@ static void task1_rtos(void)
 			// 1. 移动到抓取位置安全高度
 			move_to_position(SMALL_BOX_HEIGHT + 15.0f,task1_boxes[i].radius, task1_boxes[i].angle, 0.0f);
 			// 2. 下降到抓取高度并抓取
-			move_to_position(SMALL_BOX_HEIGHT - 18.0f,task1_boxes[i].radius, task1_boxes[i].angle, 0.0f);
+			
+			move_to_position(SMALL_BOX_HEIGHT - 20.0f,task1_boxes[i].radius, task1_boxes[i].angle, 0.0f);
+			
 			pickup_box();
 			move_to_position(3 * SMALL_BOX_HEIGHT + 20.0f,task1_boxes[i].radius, task1_boxes[i].angle, 0.0f);
 			// 3. 移动到目标位置安全高度
@@ -214,13 +216,14 @@ static void task2_rtos(void)
             // 二区放置逻辑
 					  // 第一步：预定位（径向减150mm，防碰撞）
 						move_to_position(4 * SMALL_BOX_HEIGHT + 20.0f, pickup_radius,target_zone->pos.angle,0.0f);
-						move_to_position(4 * SMALL_BOX_HEIGHT + 20.0f, target_zone->pos.radius - 180.0f,target_zone->pos.angle,90.0f);
-            move_to_position(target_zone->height_offset - 10.0f, target_zone->pos.radius - 180.0f,target_zone->pos.angle,90.0f);
+						move_to_position(4 * SMALL_BOX_HEIGHT + 20.0f, target_zone->pos.radius - 250.0f,target_zone->pos.angle,90.0f);
+            move_to_position(target_zone->height_offset - 7.0f, target_zone->pos.radius - 250.0f,target_zone->pos.angle,90.0f);
+					move_to_position(target_zone->height_offset - 7.0f, target_zone->pos.radius - 180.0f,target_zone->pos.angle,90.0f);
             // 第二步：精准定位到目标位置
-            move_to_position(target_zone->height_offset - 3.0f, target_zone->pos.radius,target_zone->pos.angle,90.0f);
+            move_to_position(target_zone->height_offset - 7.0f, target_zone->pos.radius,target_zone->pos.angle,90.0f);
             place_box();
             // 撤出吸盘
-            move_to_position(target_zone->height_offset - 3.0f, target_zone->pos.radius - 75.0f,target_zone->pos.angle,90.0f);
+            move_to_position(target_zone->height_offset - 70.0f, target_zone->pos.radius - 75.0f,target_zone->pos.angle,90.0f);
             printf("Placing in Zone 2\r\n");
         } 
 				else if (target_zone->type == 3) 

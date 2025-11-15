@@ -1,9 +1,9 @@
 ./robot/queue.o: ..\Middlewares\Third_Party\FreeRTOS\Source\queue.c \
-  D:\Keil5\ARM\ARMCLANG\Bin\..\include\stdlib.h \
-  D:\Keil5\ARM\ARMCLANG\Bin\..\include\string.h \
+  D:\Tools\keil_v5\Arm\ARMCLANG\include\stdlib.h \
+  D:\Tools\keil_v5\Arm\ARMCLANG\include\string.h \
   ..\Middlewares\Third_Party\FreeRTOS\Source\include\FreeRTOS.h \
-  D:\Keil5\ARM\ARMCLANG\Bin\..\include\stddef.h \
-  D:\Keil5\ARM\ARMCLANG\Bin\..\include\stdint.h \
+  D:\Tools\keil_v5\Arm\ARMCLANG\include\stddef.h \
+  D:\Tools\keil_v5\Arm\ARMCLANG\include\stdint.h \
   ..\Core\Inc\FreeRTOSConfig.h \
   ..\Middlewares\Third_Party\FreeRTOS\Source\include\projdefs.h \
   ..\Middlewares\Third_Party\FreeRTOS\Source\include\portable.h \

@@ -65,13 +65,13 @@
 
 // --- 规划器参数 ---
 // 底盘最大平滑速度 (rad/s)         - 【调参】
-#define PLANNER_MAX_VELOCITY        (5.00f)
+#define PLANNER_MAX_VELOCITY        (8.00f)
 // 底盘最大平滑加速度 (rad/s^2)     - 【调参】
-#define PLANNER_MAX_ACCELERATION    (0.8f) 
+#define PLANNER_MAX_ACCELERATION    (0.9f) 
 
 // --- 电机控制参数 ---
 // 电机内部的速度限制 (rad/s) - 必须大于 PLANNER_MAX_VELOCITY
-#define MOTOR_INTERNAL_SPD_LIMIT    (10.0f) 
+#define MOTOR_INTERNAL_SPD_LIMIT    (15.0f) 
 
 
 

@@ -69,8 +69,10 @@ void Task0(void *argument)
     /* 无限循环：任务调度逻辑 */
     for (;;)
     {
+				// 手动操控逻辑
 				move_to_position(test.height,test.radius,test.chassis_angle,test.suction_angle);
-//			xipan_control(1);
+				xipan_control(test.suction_switch);
+				
         // 仅当无任务运行且sys指定有效任务时，启动新任务
         if (!is_task_running && sys != TASK_NONE)
         {
@@ -144,7 +146,14 @@ static void task1_rtos(void)
 			move_to_position(3 * SMALL_BOX_HEIGHT + 20.0f,TASK1_TARGET_POS.radius, TASK1_TARGET_POS.angle, 0.0f);
 			move_to_position(times * SMALL_BOX_HEIGHT + 20.0f,TASK1_TARGET_POS.radius,TASK1_TARGET_POS.angle, 0.0f);
 			// 4. 下降到放置高度并放置
-			move_to_position(times * SMALL_BOX_HEIGHT + 5.0f, TASK1_TARGET_POS.radius,TASK1_TARGET_POS.angle,0.0f);
+			if (i == 0)
+			{
+				move_to_position(times * SMALL_BOX_HEIGHT, TASK1_TARGET_POS.radius,TASK1_TARGET_POS.angle,0.0f);
+			}
+			else
+			{
+				move_to_position(times * SMALL_BOX_HEIGHT + 5.0f, TASK1_TARGET_POS.radius,TASK1_TARGET_POS.angle,0.0f);
+			}
 			place_box();
 			move_to_position(times * SMALL_BOX_HEIGHT + 50.0f, TASK1_TARGET_POS.radius,TASK1_TARGET_POS.angle,0.0f);
     }
@@ -304,13 +313,17 @@ static void task3_rtos(void)
 						move_to_position( 3 * SMALL_BOX_HEIGHT+ 20.0f,TASK2_PICKUP_POS.radius,TASK2_PICKUP_POS.angle,0.0f);
         
 						// 2. 下降到抓取高度，吸起箱子
+						if(i == 0)
+						{
+							osDelay(3000);
+						}
 						move_to_position(pickup_height - 20.0f,TASK2_PICKUP_POS.radius,TASK2_PICKUP_POS.angle,0.0f);
 						pickup_box();
         
 						// 3. 移动到随机位置的补偿位
 						move_to_position( 3 * SMALL_BOX_HEIGHT + 20.0f,TASK2_PICKUP_POS.radius,TASK2_PICKUP_POS.angle,0.0f);
 						move_to_position( 3 * SMALL_BOX_HEIGHT + 20.0f,random_positions[i].radius,random_positions[i].angle,0.0f);
-        
+	
 						// 4. 下降到放置高度，松开箱子
 						move_to_position(SMALL_BOX_HEIGHT + 5.0f,random_positions[i].radius,random_positions[i].angle,0.0f);
 						place_box();
@@ -323,9 +336,14 @@ static void task3_rtos(void)
 				else if(random_positions[i].radius <= 600.0f && random_positions[i].radius > 450.0f)
 				{
 						float place_radius = random_positions[i].radius - 165.0f;
-						move_to_position( 3 * SMALL_BOX_HEIGHT+ 20.0f,TASK2_PICKUP_POS.radius,TASK2_PICKUP_POS.angle,0.0f);
+						move_to_position( 3 * SMALL_BOX_HEIGHT+ 20.0f,TASK2_PICKUP_POS.radius, 
+					TASK2_PICKUP_POS.angle,0.0f);
         
 						// 2. 下降到抓取高度，吸起箱子
+						if(i == 0)
+						{
+							osDelay(3000);
+						}
 						move_to_position(pickup_height - 20.0f,TASK2_PICKUP_POS.radius + 30.0f,TASK2_PICKUP_POS.angle,0.0f);
 						pickup_box();
         
